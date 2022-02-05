@@ -171,9 +171,9 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.toolBar.setWindowTitle(_("toolBar"))
         self.actionCollapse_all.setText(_("&Collapse all"))
         self.actionExpand_all.setText(_("&Expand all"))
-        self.actionRun.setText(_("&Run"))
+        self.actionRun.setText(_("&Profile"))
         self.actionRun.setShortcut(_("F5"))
-        self.actionAbort.setText(_("&Abort"))
+        self.actionAbort.setText(_("&Stop"))
         self.actionAbort.setShortcut(_("F6"))
         self.actionQuit.setText(_("&Quit"))
         self.actionQuit.setShortcut(_("Ctrl+Q"))
@@ -200,9 +200,9 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_actionRun_triggered(self):
         # Configuration dialog in case of invalid config
-        if not self.config.is_runnable:
+        if not self.config.isvalid:
             self.on_actionConfigure_triggered()
-            if not self.config.is_runnable:
+            if not self.config.isvalid:
                 return
 
         # Start process

@@ -9,15 +9,17 @@ import qtpy.compat as qtcompat
 
 from .utils import translate as _, MONOSPACE_FONT
 
+ICON_SIZE = 16
+
 
 class Config:
     def __init__(self):
-        self.wdir = None
+        self.config_wdir = None
         self.script = None
         self.args = ""
         self.env = {}
-        self.stats = None
-        self.kernprof = None
+        self.config_stats = None
+        self.config_kernprof = None
 
     def build_simple_config(self, script, args):
         self.wdir = self.default_wdir
@@ -28,8 +30,29 @@ class Config:
         self.kernprof = self.default_kernprof
 
     @property
+    def wdir(self):
+        return self.config_wdir or self.default_wdir
+
+    @property
     def default_wdir(self):
         return os.getcwd()
+
+    @property
+    def isvalid_wdir(self):
+        return not self.config_wdir or Path(self.config_wdir).isdir()
+
+    @property
+    def isvalid_script(self):
+        if not self.script:
+            return False
+        # Script file must exist, either as an ablsolute path,
+        # or relative to the working directory
+        script_path = Path(self.config_wdir or "") / Path(self.script)
+        return script_path.is_file()
+
+    @property
+    def stats(self):
+        return self.config_stats or self.default_stats
 
     @property
     def default_stats(self):
@@ -42,52 +65,80 @@ class Config:
             return os.fspath(Path(script).with_suffix(".lprof"))
 
     @property
+    def isvalid_stats(self):
+        return not self.config_stats or Path(self.config_stats).parent.isdir()
+
+    @property
+    def kernprof(self):
+        return self.config_kernprof or self.default_kernprof
+
+    @property
     def default_kernprof(self):
         return shutil.which("kernprof")
 
     @property
-    def is_runnable(self):
-        return bool(self.script)
+    def isvalid_kernprof(self):
+        default_kernprof_path = not self.config_kernprof and self.default_kernprof
+        return default_kernprof_path or Path(self.config_kernprof).is_file()
+
+    @property
+    def isvalid(self):
+        return bool(
+            self.isvalid_wdir
+            and self.isvalid_script
+            and self.isvalid_stats
+            and self.isvalid_kernprof
+        )
 
 
 class Ui_ConfigDialog(QtWidgets.QDialog):
     def __init__(self, parent, config):
-        QtWidgets.QDialog.__init__(self)
+        self.config = config
+
+        QtWidgets.QDialog.__init__(self, parent)
         self.setup_ui()
 
-        self.config = config
         self.config_to_ui()
 
     def config_to_ui(self):
-        self.wdirWidget.setText(self.config.wdir)
+        self.wdirWidget.setText(self.config.config_wdir)
         self.scriptWidget.setText(self.config.script)
         self.argsWidget.setText(self.config.args)
         self.envWidgets.setText(
             ";".join(f"{key}={value}" for key, value in self.config.env.items())
         )
-        self.statsWidget.setText(self.config.stats)
-        self.kernprofWidget.setText(self.config.kernprof)
+        self.statsWidget.setText(self.config.config_stats)
+        self.kernprofWidget.setText(self.config.config_kernprof)
 
         self.update()
 
-    def ui_to_config(self):
-        self.config.wdir = self.wdirWidget.text() or None
-        self.config.script = self.scriptWidget.text() or None
-        self.config.args = self.argsWidget.text()
-        self.config.env = {}
+    def ui_to_config(self, config=None):
+        if config is None:
+            config = self.config
+        config.config_wdir = self.wdirWidget.text() or None
+        config.script = self.scriptWidget.text() or None
+        config.args = self.argsWidget.text()
+        config.env = {}
         for var in self.envWidgets.text().split(";"):
             if var:
                 key, value = var.split("=")
-                self.config.env[key] = value
-        self.config.stats = self.statsWidget.text() or None
-        self.config.kernprof = self.kernprofWidget.text() or None
+                config.env[key] = value
+        config.config_stats = self.statsWidget.text() or None
+        config.config_kernprof = self.kernprofWidget.text() or None
 
     def update(self):
         self.wdirWidget.setPlaceholderText(self.config.default_wdir)
+        self.update_stats_placeholder()
+        self.kernprofWidget.setPlaceholderText(self.config.default_kernprof)
+        self.on_wdirWidget_textChanged("")
+        self.on_scriptWidget_textChanged("")
+        self.on_statsWidget_textChanged("")
+        self.on_kernprofWidget_textChanged("")
+
+    def update_stats_placeholder(self):
         self.statsWidget.setPlaceholderText(
             self.config.default_stats_for_script(self.scriptWidget.text())
         )
-        self.kernprofWidget.setPlaceholderText(self.config.default_kernprof)
 
     def setup_ui(self):
         # Dialog
@@ -100,39 +151,40 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
         # Working directory
         self.wdirLabel = QtWidgets.QLabel(self)
-        self.wdirLabel.setObjectName("wdirLabel")
         self.configLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.wdirLabel)
         self.wdirLayout = QtWidgets.QHBoxLayout()
-        self.wdirLayout.setObjectName("wdirLayout")
         self.wdirWidget = QtWidgets.QLineEdit(self)
         self.wdirWidget.setObjectName("wdirWidget")
         self.wdirLayout.addWidget(self.wdirWidget)
+        self.wdirStatusLabel = QtWidgets.QLabel(self)
+        self.wdirLayout.addWidget(self.wdirStatusLabel)
         self.wdirButton = QtWidgets.QPushButton(self)
         self.wdirButton.setObjectName("wdirButton")
         self.wdirLayout.addWidget(self.wdirButton)
         self.configLayout.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.wdirLayout)
+        self.wdirWidget.setValidator(ConfigValidator(self, "wdir"))
 
         # Python script
         self.scriptLabel = QtWidgets.QLabel(self)
-        self.scriptLabel.setObjectName("scriptLabel")
         self.configLayout.setWidget(
             1, QtWidgets.QFormLayout.LabelRole, self.scriptLabel
         )
         self.scriptLayout = QtWidgets.QHBoxLayout()
-        self.scriptLayout.setObjectName("scriptLayout")
         self.scriptWidget = QtWidgets.QLineEdit(self)
         self.scriptWidget.setObjectName("scriptWidget")
         self.scriptLayout.addWidget(self.scriptWidget)
+        self.scriptStatusLabel = QtWidgets.QLabel(self)
+        self.scriptLayout.addWidget(self.scriptStatusLabel)
         self.scriptButton = QtWidgets.QPushButton(self)
         self.scriptButton.setObjectName("scriptButton")
         self.scriptLayout.addWidget(self.scriptButton)
         self.configLayout.setLayout(
             1, QtWidgets.QFormLayout.FieldRole, self.scriptLayout
         )
+        self.scriptWidget.setValidator(ConfigValidator(self, "script"))
 
         # Scripts args
         self.argsLabel = QtWidgets.QLabel(self)
-        self.argsLabel.setObjectName("argsLabel")
         self.configLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.argsLabel)
         self.argsWidget = QtWidgets.QLineEdit(self)
         self.argsWidget.setFont(MONOSPACE_FONT)
@@ -141,7 +193,6 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
         # Environment variables
         self.envLabel = QtWidgets.QLabel(self)
-        self.envLabel.setObjectName("envLabel")
         self.configLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.envLabel)
         self.envWidgets = QtWidgets.QLineEdit(self)
         self.envWidgets.setObjectName("envWidgets")
@@ -149,45 +200,50 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
         # Stats filename
         self.statsLabel = QtWidgets.QLabel(self)
-        self.statsLabel.setObjectName("statsLabel")
         self.configLayout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.statsLabel)
         self.statsLayout = QtWidgets.QHBoxLayout()
-        self.statsLayout.setObjectName("statsLayout")
         self.statsWidget = QtWidgets.QLineEdit(self)
         self.statsWidget.setObjectName("statsWidget")
         self.statsLayout.addWidget(self.statsWidget)
+        self.statsStatusLabel = QtWidgets.QLabel(self)
+        self.statsLayout.addWidget(self.statsStatusLabel)
         self.statsButton = QtWidgets.QPushButton(self)
         self.statsButton.setObjectName("statsButton")
         self.statsLayout.addWidget(self.statsButton)
         self.configLayout.setLayout(
             4, QtWidgets.QFormLayout.FieldRole, self.statsLayout
         )
+        self.statsWidget.setValidator(ConfigValidator(self, "stats"))
 
         # kernprof executable
         self.kernprofLabel = QtWidgets.QLabel(self)
-        self.kernprofLabel.setObjectName("kernprofLabel")
         self.configLayout.setWidget(
             5, QtWidgets.QFormLayout.LabelRole, self.kernprofLabel
         )
         self.kernprofLayout = QtWidgets.QHBoxLayout()
-        self.kernprofLayout.setObjectName("kernprofLayout")
         self.kernprofWidget = QtWidgets.QLineEdit(self)
         self.kernprofWidget.setObjectName("kernprofWidget")
         self.kernprofLayout.addWidget(self.kernprofWidget)
+        self.kernprofStatusLabel = QtWidgets.QLabel(self)
+        self.kernprofLayout.addWidget(self.kernprofStatusLabel)
         self.kernprofButton = QtWidgets.QPushButton(self)
         self.kernprofButton.setObjectName("kernprofButton")
         self.kernprofLayout.addWidget(self.kernprofButton)
         self.configLayout.setLayout(
             5, QtWidgets.QFormLayout.FieldRole, self.kernprofLayout
         )
+        self.kernprofWidget.setValidator(ConfigValidator(self, "kernprof"))
 
         # Buttons
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        self.profileButton = self.buttonBox.addButton(
+            _("Profile"), QtWidgets.QDialogButtonBox.AcceptRole
         )
-        self.buttonBox.setCenterButtons(True)
+        self.profileButton.setObjectName("profileButton")
+        self.buttonBox.setStandardButtons(
+            QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Cancel
+        )
         self.buttonBox.setObjectName("buttonBox")
         self.configLayout.setWidget(
             6, QtWidgets.QFormLayout.SpanningRole, self.buttonBox
@@ -198,6 +254,18 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         # Finalization
         self.retranslate_ui()
         QtCore.QMetaObject.connectSlotsByName(self)
+
+        # Icons
+        self.icon_ok = (
+            self.style()
+            .standardIcon(QtWidgets.QStyle.SP_DialogApplyButton)
+            .pixmap(ICON_SIZE, ICON_SIZE)
+        )
+        self.icon_ko = (
+            self.style()
+            .standardIcon(QtWidgets.QStyle.SP_DialogCancelButton)
+            .pixmap(ICON_SIZE, ICON_SIZE)
+        )
 
     def retranslate_ui(self):
         self.setWindowTitle(_("Line profiler configuration"))
@@ -216,6 +284,17 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     def accept(self):
         self.ui_to_config()
         QtWidgets.QDialog.accept(self)
+        super().accept()
+
+    @QtCore.Slot()
+    def on_profileButton_clicked(self):
+        self.accept()
+        self.parent().on_actionRun_triggered()
+
+    def update_profileButton_enabled(self):
+        config = Config()
+        self.ui_to_config(config)
+        self.profileButton.setEnabled(config.isvalid)
 
     @QtCore.Slot()
     def on_wdirButton_clicked(self):
@@ -224,6 +303,29 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         )
         if filename:
             self.wdirWidget.setText(filename)
+
+    def display_status(self, widget, indicator):
+        indicator.setPixmap(
+            self.icon_ok if widget.hasAcceptableInput() else self.icon_ko
+        )
+        self.update_profileButton_enabled()
+
+    @QtCore.Slot(str)
+    def on_wdirWidget_textChanged(self, text):
+        self.display_status(self.wdirWidget, self.wdirStatusLabel)
+
+    @QtCore.Slot(str)
+    def on_scriptWidget_textChanged(self, text):
+        self.display_status(self.scriptWidget, self.scriptStatusLabel)
+        self.update_stats_placeholder()
+
+    @QtCore.Slot(str)
+    def on_statsWidget_textChanged(self, text):
+        self.display_status(self.statsWidget, self.statsStatusLabel)
+
+    @QtCore.Slot(str)
+    def on_kernprofWidget_textChanged(self, text):
+        self.display_status(self.kernprofWidget, self.kernprofStatusLabel)
 
     @QtCore.Slot()
     def on_scriptButton_clicked(self):
@@ -258,7 +360,21 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         if filename:
             self.kernprofWidget.setText(filename)
 
-    @QtCore.Slot(str)
-    def on_scriptWidget_textChanged(self, text):
-        # Update placeholder text
-        self.update()
+
+class ConfigValidator(QtGui.QValidator):
+    def __init__(self, configDialog, widgetID):
+        QtGui.QValidator.__init__(self)
+        self.configDialog = configDialog
+        self.widgetID = widgetID
+
+    @QtCore.Slot(str, int)
+    def validate(self, text, pos):
+        config = Config()
+        self.configDialog.ui_to_config(config)
+        return (
+            QtGui.QValidator.Acceptable
+            if getattr(config, f"isvalid_{self.widgetID}")
+            else QtGui.QValidator.Intermediate,
+            text,
+            pos,
+        )

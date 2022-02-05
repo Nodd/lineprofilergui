@@ -45,6 +45,10 @@ class Config:
     def default_kernprof(self):
         return shutil.which("kernprof")
 
+    @property
+    def is_runnable(self):
+        return bool(self.script)
+
 
 class Ui_ConfigDialog(QtWidgets.QDialog):
     def __init__(self, parent, config):
@@ -230,13 +234,6 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
             _("Python scripts") + " (*.py ; *.pyw)",
         )
         if filename:
-            path = Path(filename)
-            try:
-                path = path.relative_to(self.config.wdir)
-            except ValueError:
-                pass
-            else:
-                filename = os.fspath(path)
             self.scriptWidget.setText(filename)
 
     @QtCore.Slot()

@@ -192,16 +192,20 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             title += f" - {self.config.script}"
         self.setWindowTitle(title)
 
-    def configure(self):
+    @QtCore.Slot()
+    def on_actionConfigure_triggered(self):
         Ui_ConfigDialog(self, self.config).exec()
         self.update_window_title()
 
     @QtCore.Slot()
-    def on_actionConfigure_triggered(self):
-        self.configure()
-
-    @QtCore.Slot()
     def on_actionRun_triggered(self):
+        # Configuration dialog in case of invalid config
+        if not self.config.is_runnable:
+            self.on_actionConfigure_triggered()
+            if not self.config.is_runnable:
+                return
+
+        # Start process
         self.outputWidget.clear()
         process = self.kernprof_run.prepare()
         process.stateChanged.connect(self.set_running_state)
@@ -240,7 +244,7 @@ def create_app(options):
         if options.run:
             win.on_actionRun_triggered()
     else:
-        win.configure()
+        win.on_actionConfigure_triggered()
 
     # Keep a reference to the win object to avoid destruction
     app.win = win

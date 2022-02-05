@@ -2,8 +2,7 @@ import sys
 import argparse
 
 from .gui import create_app
-
-__version__ = "0.0"
+from . import __version__
 
 
 def positive_float(value):

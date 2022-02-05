@@ -1,3 +1,9 @@
 # Python
 __pycache__/
+
+# Profiling
 *.lprof
+
+# Packaging
+*.egg-info/
+dist/

@@ -3,7 +3,7 @@ import qtpy.compat as qtcompat
 
 from .config import Config, Ui_ConfigDialog
 from .tree import ResultsTreeWidget
-from .utils import translate as _, MONOSPACE_FONT
+from .utils import translate as _, MONOSPACE_FONT, _icons_factory, ICONS
 from .process import KernprofRun
 
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
@@ -73,22 +73,30 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Actions
         self.actionCollapse_all = QtWidgets.QAction(self)
+        self.actionCollapse_all.setIcon(ICONS["COLLAPSE"])
         self.actionCollapse_all.setObjectName("actionCollapse_all")
         self.actionExpand_all = QtWidgets.QAction(self)
+        self.actionExpand_all.setIcon(ICONS["EXPAND"])
         self.actionExpand_all.setObjectName("actionExpand_all")
         self.actionRun = QtWidgets.QAction(self)
+        self.actionRun.setIcon(ICONS["START"])
         self.actionRun.setObjectName("actionRun")
         self.actionAbort = QtWidgets.QAction(self)
+        self.actionAbort.setIcon(ICONS["STOP"])
         self.actionAbort.setObjectName("actionAbort")
         self.actionQuit = QtWidgets.QAction(self)
+        self.actionQuit.setIcon(ICONS["ABORT"])
         self.actionQuit.setObjectName("actionQuit")
         self.actionConfigure = QtWidgets.QAction(self)
+        self.actionConfigure.setIcon(ICONS["CONFIG"])
         self.actionConfigure.setObjectName("actionConfigure")
         self.actionLine_profiler_documentation = QtWidgets.QAction(self)
+        self.actionLine_profiler_documentation.setIcon(ICONS["HELP"])
         self.actionLine_profiler_documentation.setObjectName(
             "actionLine_profiler_documentation"
         )
         self.actionAbout_Qt = QtWidgets.QAction(self)
+        self.actionAbout_Qt.setIcon(ICONS["QT"])
         self.actionAbout_Qt.setObjectName("actionAbout_Qt")
 
         # Menu bar
@@ -234,6 +242,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 def create_app(options):
     # Create Qt application
     app = QtWidgets.QApplication([])
+    _icons_factory()
 
     # Create main window
     win = UI_MainWindow()

@@ -7,9 +7,7 @@ from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
 
 
-from .utils import translate as _, MONOSPACE_FONT
-
-ICON_SIZE = 16
+from .utils import translate as _, MONOSPACE_FONT, PIXMAPS
 
 
 class Config:
@@ -256,18 +254,6 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.retranslate_ui()
         QtCore.QMetaObject.connectSlotsByName(self)
 
-        # Icons
-        self.icon_ok = (
-            self.style()
-            .standardIcon(QtWidgets.QStyle.SP_DialogApplyButton)
-            .pixmap(ICON_SIZE, ICON_SIZE)
-        )
-        self.icon_ko = (
-            self.style()
-            .standardIcon(QtWidgets.QStyle.SP_DialogCancelButton)
-            .pixmap(ICON_SIZE, ICON_SIZE)
-        )
-
     def retranslate_ui(self):
         self.setWindowTitle(_("Line profiler configuration"))
         self.wdirLabel.setText(_("Working directory"))
@@ -306,9 +292,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
             self.wdirWidget.setText(filename)
 
     def display_status(self, widget, indicator):
-        indicator.setPixmap(
-            self.icon_ok if widget.hasAcceptableInput() else self.icon_ko
-        )
+        indicator.setPixmap(PIXMAPS["OK" if widget.hasAcceptableInput() else "NOK"])
         self.update_profileButton_enabled()
 
     @QtCore.Slot(str)

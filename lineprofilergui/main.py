@@ -50,8 +50,7 @@ def commandline_args():
 
     options = parser.parse_args()
 
-    if options.args:
-        options.args = " ".join(options.args)
+    options.args = " ".join(options.args)
 
     return options
 

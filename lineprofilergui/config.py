@@ -22,12 +22,13 @@ class Config:
         self.config_kernprof = None
 
     def build_simple_config(self, script, args):
-        self.wdir = self.default_wdir
         self.script = script
         self.args = args
+
+        self.config_wdir = None
         self.env = {}
-        self.stats = self.default_stats
-        self.kernprof = self.default_kernprof
+        self.config_stats = None
+        self.config_kernprof = None
 
     @property
     def wdir(self):

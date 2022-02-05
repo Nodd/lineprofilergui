@@ -243,6 +243,8 @@ def create_app(options):
         win.update_window_title()
         if options.run:
             win.on_actionRun_triggered()
+        else:
+            win.on_actionConfigure_triggered()
     else:
         win.on_actionConfigure_triggered()
 

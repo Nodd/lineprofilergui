@@ -7,22 +7,22 @@ from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
 
 
-from utils import translate as _
+from utils import translate as _, MONOSPACE_FONT
 
 
 class Config:
     def __init__(self):
         self.wdir = None
         self.script = None
-        self.arguments = ""
+        self.args = ""
         self.env = {}
         self.stats = None
         self.kernprof = None
 
-    def build_simple_config(self, script, arguments):
+    def build_simple_config(self, script, args):
         self.wdir = self.default_wdir
         self.script = script
-        self.arguments = arguments
+        self.args = args
         self.env = {}
         self.stats = self.default_stats
         self.kernprof = self.default_kernprof
@@ -57,7 +57,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     def config_to_ui(self):
         self.wdirWidget.setText(self.config.wdir)
         self.scriptWidget.setText(self.config.script)
-        self.argumentsWidget.setText(self.config.arguments)
+        self.argsWidget.setText(self.config.args)
         self.envWidgets.setText(
             ";".join(f"{key}={value}" for key, value in self.config.env.items())
         )
@@ -69,7 +69,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     def ui_to_config(self):
         self.config.wdir = self.wdirWidget.text() or None
         self.config.script = self.scriptWidget.text() or None
-        self.config.arguments = self.argumentsWidget.text()
+        self.config.args = self.argsWidget.text()
         self.config.env = {}
         for var in self.envWidgets.text().split(";"):
             if var:
@@ -126,20 +126,14 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
             1, QtWidgets.QFormLayout.FieldRole, self.scriptLayout
         )
 
-        # Scripts arguments
-        self.argumentsLabel = QtWidgets.QLabel(self)
-        self.argumentsLabel.setObjectName("argumentsLabel")
-        self.configLayout.setWidget(
-            2, QtWidgets.QFormLayout.LabelRole, self.argumentsLabel
-        )
-        self.argumentsWidget = QtWidgets.QLineEdit(self)
-        font = QtGui.QFont("Monospace")
-        font.setStyleHint(QtGui.QFont.Monospace)
-        self.argumentsWidget.setFont(font)
-        self.argumentsWidget.setObjectName("argumentsWidget")
-        self.configLayout.setWidget(
-            2, QtWidgets.QFormLayout.FieldRole, self.argumentsWidget
-        )
+        # Scripts args
+        self.argsLabel = QtWidgets.QLabel(self)
+        self.argsLabel.setObjectName("argsLabel")
+        self.configLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.argsLabel)
+        self.argsWidget = QtWidgets.QLineEdit(self)
+        self.argsWidget.setFont(MONOSPACE_FONT)
+        self.argsWidget.setObjectName("argsWidget")
+        self.configLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.argsWidget)
 
         # Environment variables
         self.envLabel = QtWidgets.QLabel(self)
@@ -207,7 +201,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirButton.setText(_("Select..."))
         self.scriptLabel.setText(_("Python script"))
         self.scriptButton.setText(_("Select..."))
-        self.argumentsLabel.setText(_("Script arguments"))
+        self.argsLabel.setText(_("Script args"))
         self.envLabel.setText(_("Environment variables"))
         self.statsLabel.setText(_("Stats filename"))
         self.statsButton.setText(_("Select..."))

@@ -9,7 +9,8 @@ from tree import ResultsTreeWidget
 
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
 
-from utils import translate as _
+from utils import translate as _, MONOSPACE_FONT
+from process import KernprofRun
 
 
 class UI_MainWindow(QtWidgets.QMainWindow):
@@ -18,6 +19,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         QtWidgets.QMainWindow.__init__(self)
         self.setup_ui()
+        self.kernprof_run = KernprofRun(self.config)
+        self.connect()
 
     def setup_ui(self):
         # Main window
@@ -59,7 +62,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             | QtCore.Qt.TextSelectableByKeyboard
             | QtCore.Qt.TextSelectableByMouse
         )
-        self.outputWidget.setCenterOnScroll(True)
+        self.outputWidget.setFont(MONOSPACE_FONT)
         self.outputWidget.setObjectName("outputWidget")
         self.outputTabLayout.addWidget(self.outputWidget)
 
@@ -74,29 +77,22 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         # Actions
         self.actionCollapse_all = QtWidgets.QAction(self)
         self.actionCollapse_all.setObjectName("actionCollapse_all")
-        self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
         self.actionExpand_all = QtWidgets.QAction(self)
         self.actionExpand_all.setObjectName("actionExpand_all")
-        self.actionExpand_all.triggered.connect(self.resultsTreeWidget.expandAll)
         self.actionRun = QtWidgets.QAction(self)
         self.actionRun.setObjectName("actionRun")
         self.actionAbort = QtWidgets.QAction(self)
         self.actionAbort.setObjectName("actionAbort")
         self.actionQuit = QtWidgets.QAction(self)
         self.actionQuit.setObjectName("actionQuit")
-        self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionConfigure = QtWidgets.QAction(self)
         self.actionConfigure.setObjectName("actionConfigure")
         self.actionLine_profiler_documentation = QtWidgets.QAction(self)
         self.actionLine_profiler_documentation.setObjectName(
             "actionLine_profiler_documentation"
         )
-        self.actionLine_profiler_documentation.triggered.connect(
-            lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl(LINE_PROFILER_DOC_URL))
-        )
         self.actionAbout_Qt = QtWidgets.QAction(self)
         self.actionAbout_Qt.setObjectName("actionAbout_Qt")
-        self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
 
         # Menu bar
         self.menubar = QtWidgets.QMenuBar(self)
@@ -149,7 +145,21 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Finalization
         self.retranslate_ui()
+        self.set_running_state(False)
+
+    def connect(self):
         QtCore.QMetaObject.connectSlotsByName(self)
+        self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
+        self.actionExpand_all.triggered.connect(self.resultsTreeWidget.expandAll)
+        self.actionRun.triggered.connect(self.kernprof_run.start)
+        self.actionAbort.triggered.connect(self.kernprof_run.kill)
+        self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
+        self.actionLine_profiler_documentation.triggered.connect(
+            lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl(LINE_PROFILER_DOC_URL))
+        )
+        self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
+        self.kernprof_run.output_text.connect(self.append_log_text)
+        self.kernprof_run.output_error.connect(self.append_log_error)
 
     def retranslate_ui(self):
         self.update_window_title()
@@ -196,15 +206,29 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_actionRun_triggered(self):
-        ...
+        self.outputWidget.clear()
+        process = self.kernprof_run.prepare()
+        process.stateChanged.connect(self.set_running_state)
+        process.finished.connect(self.process_finished)
+        self.kernprof_run.start()
+
+    @QtCore.Slot(QtCore.QProcess.ProcessState)
+    def set_running_state(self, running):
+        self.actionRun.setEnabled(not running)
+        self.actionAbort.setEnabled(running)
+        self.actionConfigure.setEnabled(not running)
+
+    @QtCore.Slot(str)
+    def append_log_text(self, text):
+        self.outputWidget.appendPlainText(text)
+
+    @QtCore.Slot(str)
+    def append_log_error(self, text):
+        self.outputWidget.appendHtml(f'<p style="color:red;white-space:pre">{text}</p>')
 
     @QtCore.Slot()
-    def on_actionAbort_triggered(self):
+    def process_finished(self):
         ...
-
-    def set_running_state(self, state=True):
-        self.start_button.setEnabled(not state)
-        self.stop_button.setEnabled(state)
 
 
 def main():
@@ -226,12 +250,13 @@ def main():
 
     # Create main window
     win = UI_MainWindow()
+    win.show()
     if script:
         win.config.build_simple_config(script, script_args)
         win.update_window_title()
+        win.on_actionRun_triggered()
     else:
         win.configure()
-    win.show()
 
     # Start event loop
     sys.exit(app.exec_())

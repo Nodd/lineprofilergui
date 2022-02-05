@@ -4,7 +4,7 @@ import linecache
 
 from qtpy import QtCore
 
-from utils import translate as _
+from .utils import translate as _
 
 LOCALE_CODEC = QtCore.QTextCodec.codecForLocale()
 

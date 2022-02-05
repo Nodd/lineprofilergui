@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from gui import create_app
+from .gui import create_app
 
 __version__ = "0.0"
 

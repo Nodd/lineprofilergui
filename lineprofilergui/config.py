@@ -7,7 +7,7 @@ from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
 
 
-from utils import translate as _, MONOSPACE_FONT
+from .utils import translate as _, MONOSPACE_FONT
 
 
 class Config:

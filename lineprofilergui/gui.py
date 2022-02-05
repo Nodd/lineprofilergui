@@ -1,13 +1,12 @@
 from qtpy import QtCore, QtGui, QtWidgets
 import qtpy.compat as qtcompat
 
-from config import Config, Ui_ConfigDialog
-from tree import ResultsTreeWidget
+from .config import Config, Ui_ConfigDialog
+from .tree import ResultsTreeWidget
+from .utils import translate as _, MONOSPACE_FONT
+from .process import KernprofRun
 
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
-
-from utils import translate as _, MONOSPACE_FONT
-from process import KernprofRun
 
 
 class UI_MainWindow(QtWidgets.QMainWindow):

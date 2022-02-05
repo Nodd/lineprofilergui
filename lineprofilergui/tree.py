@@ -9,7 +9,7 @@ import math
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
 
-from utils import translate as _, MONOSPACE_FONT
+from .utils import translate as _, MONOSPACE_FONT
 
 
 def load_profile_data(filename):

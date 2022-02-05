@@ -1,6 +1,3 @@
-import sys
-import argparse
-
 from qtpy import QtCore, QtGui, QtWidgets
 import qtpy.compat as qtcompat
 
@@ -24,7 +21,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     def setup_ui(self):
         # Main window
-        self.setObjectName("self")
+        self.setObjectName("UI_MainWindow")
+        # app.setWindowIcon(QIcon(_WINDOW_ICON))
         self.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
@@ -231,36 +229,22 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         ...
 
 
-def main():
-    # Manage arguments by hand : args will be passed to the python script
-    args = sys.argv[1:]
-    if args:
-        if args[0] in ("-h", "--help"):
-            print("Help !!!")
-            return
-        script = args[0]
-        script_args = " ".join(args[1:])
-    else:
-        script = None
-        script_args = ""
-
-    # Create application
-    app = QtWidgets.QApplication(sys.argv)
-    # app.setWindowIcon(QIcon(_WINDOW_ICON))
+def create_app(options):
+    # Create Qt application
+    app = QtWidgets.QApplication([])
 
     # Create main window
     win = UI_MainWindow()
     win.show()
-    if script:
-        win.config.build_simple_config(script, script_args)
+    if options.script:
+        win.config.build_simple_config(options.script, options.args)
         win.update_window_title()
-        win.on_actionRun_triggered()
+        if options.run:
+            win.on_actionRun_triggered()
     else:
         win.configure()
 
-    # Start event loop
-    sys.exit(app.exec_())
+    # Keep a reference to the win object to avoid destruction
+    app.win = win
 
-
-if __name__ == "__main__":
-    main()
+    return app

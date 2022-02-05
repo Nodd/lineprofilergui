@@ -1,10 +1,10 @@
 import sys
-from pathlib import Path
 import argparse
 
 from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.compat import getopenfilename
+import qtpy.compat as qtcompat
 
+from config import Config, Ui_ConfigDialog
 from tree import ResultsTreeWidget
 
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
@@ -12,12 +12,12 @@ LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
 from utils import translate as _
 
 
-class Ui_MainWindow(QtWidgets.QMainWindow):
+class UI_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
+        self.config = Config()
+
         QtWidgets.QMainWindow.__init__(self)
         self.setup_ui()
-        self.retranslate_ui()
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def setup_ui(self):
         # Main window
@@ -85,8 +85,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionQuit = QtWidgets.QAction(self)
         self.actionQuit.setObjectName("actionQuit")
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
-        self.actionSelect_script = QtWidgets.QAction(self)
-        self.actionSelect_script.setObjectName("actionSelect_script")
+        self.actionConfigure = QtWidgets.QAction(self)
+        self.actionConfigure.setObjectName("actionConfigure")
         self.actionLine_profiler_documentation = QtWidgets.QAction(self)
         self.actionLine_profiler_documentation.setObjectName(
             "actionLine_profiler_documentation"
@@ -107,7 +107,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Profiling menu
         self.menuProfiling = QtWidgets.QMenu(self.menubar)
         self.menuProfiling.setObjectName("menuProfiling")
-        self.menuProfiling.addAction(self.actionSelect_script)
+        self.menuProfiling.addAction(self.actionConfigure)
         self.menuProfiling.addSeparator()
         self.menuProfiling.addAction(self.actionRun)
         self.menuProfiling.addAction(self.actionAbort)
@@ -134,12 +134,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.toolBar = QtWidgets.QToolBar(self)
         self.toolBar.setObjectName("toolBar")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
-        self.toolBar.addAction(self.actionSelect_script)
-        self.scriptLineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.scriptLineEdit.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.scriptLineEdit.setFrame(True)
-        self.scriptLineEdit.setObjectName("scriptLineEdit")
-        self.toolBar.addWidget(self.scriptLineEdit)
+        self.toolBar.addAction(self.actionConfigure)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionRun)
         self.toolBar.addAction(self.actionAbort)
@@ -152,9 +147,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
 
+        # Finalization
+        self.retranslate_ui()
+        QtCore.QMetaObject.connectSlotsByName(self)
+
     def retranslate_ui(self):
-        self.setWindowTitle(_("Line Profiler GUI"))
-        self.scriptLineEdit.setPlaceholderText(_("Python script to profile"))
+        self.update_window_title()
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.resultsTab), _("Profiling results"),
         )
@@ -173,14 +171,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionAbort.setShortcut(_("F6"))
         self.actionQuit.setText(_("&Quit"))
         self.actionQuit.setShortcut(_("Ctrl+Q"))
-        self.actionSelect_script.setText(_("&Select script..."))
-        self.actionSelect_script.setToolTip(_("Select script"))
-        self.actionSelect_script.setShortcut(_("Ctrl+O"))
+        self.actionConfigure.setText(_("&Configuration..."))
+        self.actionConfigure.setToolTip(_("Configuration"))
+        self.actionConfigure.setShortcut(_("Ctrl+O"))
         self.actionLine_profiler_documentation.setText(
             _("&Line profiler documentation...")
         )
         self.actionLine_profiler_documentation.setShortcut(_("F1"))
         self.actionAbout_Qt.setText(_("&About Qt..."))
+
+    def update_window_title(self):
+        title = _("Line Profiler GUI")
+        if self.config.script:
+            title += f" - {self.config.script}"
+        self.setWindowTitle(title)
+
+    def configure(self):
+        Ui_ConfigDialog(self, self.config).exec()
+        self.update_window_title()
+
+    @QtCore.Slot()
+    def on_actionConfigure_triggered(self):
+        self.configure()
 
     @QtCore.Slot()
     def on_actionRun_triggered(self):
@@ -190,44 +202,36 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def on_actionAbort_triggered(self):
         ...
 
-    @QtCore.Slot()
-    def on_actionSelect_script_triggered(self):
-        filename, _selfilter = getopenfilename(
-            self,
-            _("Select Python script"),
-            self.scriptLineEdit.text(),
-            _("Python scripts") + " (*.py ; *.pyw)",
-        )
-        if filename:
-            self.scriptLineEdit.setText(filename)
-
     def set_running_state(self, state=True):
         self.start_button.setEnabled(not state)
         self.stop_button.setEnabled(state)
 
 
 def main():
-    # Manage arguments with argparse
-    parser = argparse.ArgumentParser(description="TODO")
-    parser.add_argument(
-        "filename", help="Python script to profile", type=Path, nargs="?"
-    )
-
-    args = parser.parse_args()
+    # Manage arguments by hand : args will be passed to the python script
+    args = sys.argv[1:]
+    if args:
+        if args[0] in ("-h", "--help"):
+            print("Help !!!")
+            return
+        script = args[0]
+        script_args = " ".join(args[1:])
+    else:
+        script = None
+        script_args = ""
 
     # Create application
     app = QtWidgets.QApplication(sys.argv)
     # app.setWindowIcon(QIcon(_WINDOW_ICON))
 
     # Create main window
-    win = Ui_MainWindow()
+    win = UI_MainWindow()
+    if script:
+        win.config.build_simple_config(script, script_args)
+        win.update_window_title()
+    else:
+        win.configure()
     win.show()
-
-    # Open file given in commandline
-    # if args.filename:
-    #     win.set_script(args.filename)
-    # else:
-    #     win.on_actionSelect_script_triggered()
 
     # Start event loop
     sys.exit(app.exec_())

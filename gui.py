@@ -226,7 +226,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def process_finished(self):
-        ...
+        self.resultsTreeWidget.load_data(self.config.stats)
 
 
 def create_app(options):

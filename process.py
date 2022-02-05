@@ -1,5 +1,6 @@
 import os
 import shlex
+import linecache
 
 from qtpy import QtCore
 
@@ -34,7 +35,7 @@ class KernprofRun(QtCore.QObject):
             # confusion with escape characters (otherwise, for example, '\t'
             # will be interpreted as a tabulation):
             filename = os.path.normpath(filename).replace(os.sep, "/")
-        self.p_args = ["-lvb", "-o", self.config.stats, filename]
+        self.p_args = ["-l", "-o", self.config.stats, filename]
         if self.config.args:
             self.p_args.extend(shlex.split(self.config.args))
 
@@ -46,6 +47,9 @@ class KernprofRun(QtCore.QObject):
             self.p_args,
             QtCore.QIODevice.ReadOnly | QtCore.QIODevice.Unbuffered,
         )
+
+        # Update file cache, to be able to load the code from profiled files in the state that they were run (as much as possible...)
+        linecache.checkcache()
 
         running = self.process.waitForStarted()
         if not running:

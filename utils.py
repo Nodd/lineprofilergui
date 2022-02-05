@@ -7,3 +7,4 @@ translate = partial(QtCore.QCoreApplication.translate, "self")
 
 MONOSPACE_FONT = QtGui.QFont("Monospace")
 MONOSPACE_FONT.setStyleHint(QtGui.QFont.Monospace)
+MONOSPACE_FONT.setPointSize(9)

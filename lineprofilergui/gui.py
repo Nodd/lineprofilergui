@@ -148,7 +148,6 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
         self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
         self.actionExpand_all.triggered.connect(self.resultsTreeWidget.expandAll)
-        self.actionRun.triggered.connect(self.kernprof_run.start)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionLine_profiler_documentation.triggered.connect(

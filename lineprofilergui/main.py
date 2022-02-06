@@ -30,21 +30,7 @@ def commandline_args():
 
     # TODO
     parser.add_argument(
-        "-s", "--setup", help="Code to execute before the code to profile"
-    )
-    parser.add_argument(
-        "-u",
-        "--unit",
-        default=1e-6,
-        type=positive_float,
-        help="Output unit (in seconds) in which the timing info is "
-        "displayed (default: 1e-6)",
-    )
-    parser.add_argument(
-        "-z",
-        "--skip-zero",
-        action="store_true",
-        help="Hide functions which have not been called",
+        "-s", "--setup", help="Python script to execute before the code to profile"
     )
 
     parser.add_argument("script", nargs="?", help="The python script file to run")

@@ -25,8 +25,11 @@ class KernprofRun(QtCore.QObject):
         self.process.readyReadStandardOutput.connect(self.read_output)
         self.process.readyReadStandardError.connect(self.read_error)
 
-        # TODO: manage env
-        # self.process.setProcessEnvironment(processEnvironment)
+        # Manage environment
+        qenv = QtCore.QProcessEnvironment.systemEnvironment()
+        for name, value in self.config.env.items():
+            qenv.insert(name, value)
+        self.process.setProcessEnvironment(qenv)
 
         self.process.setWorkingDirectory(self.config.wdir)
         filename = self.config.script

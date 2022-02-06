@@ -1,5 +1,6 @@
 import os
 import shutil
+import shlex
 from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -15,7 +16,7 @@ class Config:
         self.config_wdir = None
         self.script = None
         self.args = ""
-        self.env = {}
+        self.config_env = ""
         self.config_stats = None
         self.config_kernprof = None
 
@@ -24,7 +25,7 @@ class Config:
         self.args = args
 
         self.config_wdir = None
-        self.env = {}
+        self.config_env = ""
         self.config_stats = None
         self.config_kernprof = None
 
@@ -81,12 +82,29 @@ class Config:
         return default_kernprof_path or Path(self.config_kernprof).is_file()
 
     @property
+    def env(self):
+        env = {}
+        for var in shlex.split(self.config_env):
+            name, value = var.split("=", maxsplit=1)
+            env[name] = value
+        return env
+
+    @property
+    def isvalid_env(self):
+        try:
+            self.env
+        except ValueError:
+            return False
+        return True
+
+    @property
     def isvalid(self):
         return bool(
             self.isvalid_wdir
             and self.isvalid_script
             and self.isvalid_stats
             and self.isvalid_kernprof
+            and self.isvalid_env
         )
 
 
@@ -103,9 +121,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirWidget.setText(self.config.config_wdir)
         self.scriptWidget.setText(self.config.script)
         self.argsWidget.setText(self.config.args)
-        self.envWidgets.setText(
-            ";".join(f"{key}={value}" for key, value in self.config.env.items())
-        )
+        self.envWidget.setText(self.config.config_env)
         self.statsWidget.setText(self.config.config_stats)
         self.kernprofWidget.setText(self.config.config_kernprof)
 
@@ -117,11 +133,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         config.config_wdir = self.wdirWidget.text() or None
         config.script = self.scriptWidget.text() or None
         config.args = self.argsWidget.text()
-        config.env = {}
-        for var in self.envWidgets.text().split(";"):
-            if var:
-                key, value = var.split("=")
-                config.env[key] = value
+        config.config_env = self.envWidget.text()
         config.config_stats = self.statsWidget.text() or None
         config.config_kernprof = self.kernprofWidget.text() or None
 
@@ -133,6 +145,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.on_scriptWidget_textChanged("")
         self.on_statsWidget_textChanged("")
         self.on_kernprofWidget_textChanged("")
+        self.on_envWidget_textChanged("")
 
     def update_stats_placeholder(self):
         self.statsWidget.setPlaceholderText(
@@ -193,9 +206,14 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         # Environment variables
         self.envLabel = QtWidgets.QLabel(self)
         self.configLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.envLabel)
-        self.envWidgets = QtWidgets.QLineEdit(self)
-        self.envWidgets.setObjectName("envWidgets")
-        self.configLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.envWidgets)
+        self.envLayout = QtWidgets.QHBoxLayout()
+        self.envWidget = QtWidgets.QLineEdit(self)
+        self.envWidget.setObjectName("envWidget")
+        self.envLayout.addWidget(self.envWidget)
+        self.envStatusLabel = QtWidgets.QLabel(self)
+        self.envLayout.addWidget(self.envStatusLabel)
+        self.configLayout.setLayout(3, QtWidgets.QFormLayout.FieldRole, self.envLayout)
+        self.envWidget.setValidator(ConfigValidator(self, "env"))
 
         # Stats filename
         self.statsLabel = QtWidgets.QLabel(self)
@@ -311,6 +329,10 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     @QtCore.Slot(str)
     def on_kernprofWidget_textChanged(self, text):
         self.display_status(self.kernprofWidget, self.kernprofStatusLabel)
+
+    @QtCore.Slot(str)
+    def on_envWidget_textChanged(self, text):
+        self.display_status(self.envWidget, self.envStatusLabel)
 
     @QtCore.Slot()
     def on_scriptButton_clicked(self):

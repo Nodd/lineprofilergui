@@ -1,3 +1,5 @@
+import datetime
+
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
@@ -18,6 +20,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.setup_ui()
         self.kernprof_run = KernprofRun(self.config)
         self.connect()
+
+        self.profile_start_time = None
 
     def setup_ui(self):
         # Main window
@@ -120,6 +124,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             )
         )
         self.statusbar.addPermanentWidget(self.statusbar_running_indicator)
+        self.statusbar_time = QtWidgets.QLabel()
+        self.statusbar.addWidget(self.statusbar_time)
 
         # Finalization
         self.retranslate_ui()
@@ -143,7 +149,6 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     def retranslate_ui(self):
         self.update_window_title()
         self.toolBar.setWindowTitle(_("Tool bar"))
-        self.dockOutputWidget.setWindowTitle(_("Console output"))
         self.menuDisplay.setTitle(_("&Display"))
         self.menuProfiling.setTitle(_("&Profiling"))
         self.menuHelp.setTitle(_("&Help"))
@@ -189,6 +194,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         process = self.kernprof_run.prepare()
         process.stateChanged.connect(self.set_running_state)
         process.finished.connect(self.process_finished)
+        self.profile_start_time = datetime.datetime.now()
         self.kernprof_run.start()
 
     @QtCore.Slot(QtCore.QProcess.ProcessState)
@@ -201,10 +207,32 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             self.setCursor(Qt.WaitCursor)
             self.statusbar_running_indicator_timer.start(800)
             self.actionShowOutput.setIcon(ICONS["RUNNING"])
+            self.dockOutputWidget.setWindowTitle(_("{} Console output").format("🔄"))
         else:
             self.unsetCursor()
             self.statusbar_running_indicator_timer.stop()
-            # self.actionShowOutput is set in self.process_finished()
+            # status icons are set in self.process_finished()
+
+    @QtCore.Slot(int, QtCore.QProcess.ExitStatus)
+    def process_finished(self, exit_code, exit_status):
+        profile_stop_time = datetime.datetime.now()
+        profile_duration = profile_stop_time - self.profile_start_time
+        self.statusbar_time.setText(
+            _("Last profiling ended at {time} and ran for {duration}").format(
+                time=profile_stop_time.isoformat(sep=" ", timespec="seconds"),
+                duration=str(profile_duration),
+            )
+        )
+        if exit_code or exit_status:
+            self.dockOutputWidget.show()
+            self.dockOutputWidget.activateWindow()
+            self.outputWidget.setFocus(Qt.OtherFocusReason)
+            self.actionShowOutput.setIcon(ICONS["WARNING"])
+            self.dockOutputWidget.setWindowTitle(_("{} Console output").format("⚠"))
+        else:
+            self.actionShowOutput.setIcon(ICONS["INFO"])
+            self.dockOutputWidget.setWindowTitle(_("{} Console output").format("ⓘ"))
+        self.resultsTreeWidget.load_data(self.config.stats)
 
     @QtCore.Slot(str)
     def append_log_text(self, text):
@@ -213,17 +241,6 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot(str)
     def append_log_error(self, text):
         self.outputWidget.appendHtml(f'<p style="color:red;white-space:pre">{text}</p>')
-
-    @QtCore.Slot(int, QtCore.QProcess.ExitStatus)
-    def process_finished(self, exit_code, exit_status):
-        if exit_code or exit_status:
-            self.dockOutputWidget.show()
-            self.dockOutputWidget.activateWindow()
-            self.outputWidget.setFocus(Qt.OtherFocusReason)
-            self.actionShowOutput.setIcon(ICONS["ERROR"])
-        else:
-            self.actionShowOutput.setIcon(ICONS["INFO"])
-        self.resultsTreeWidget.load_data(self.config.stats)
 
 
 def create_app(options):

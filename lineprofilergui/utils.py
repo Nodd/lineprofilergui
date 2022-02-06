@@ -22,10 +22,10 @@ _ICON_IDS = {
     "EXPAND": QtWidgets.QStyle.SP_ToolBarVerticalExtensionButton,  # actionExpand_all
     "COLLAPSE": QtWidgets.QStyle.SP_ToolBarHorizontalExtensionButton,  # actionCollapse_all
     "QT": QtWidgets.QStyle.SP_TitleBarMenuButton,  # actionAbout_Qt
-    "HELP": QtWidgets.QStyle.SP_MessageBoxQuestion,  # actionLine_profiler_documentation
-    "INFO": QtWidgets.QStyle.SP_MessageBoxInformation,
-    "BUG": QtWidgets.QStyle.SP_MessageBoxCritical,
-    "RUNNING": QtWidgets.QStyle.SP_BrowserReload,  # statusbar_running_indicator
+    "HELP": QtWidgets.QStyle.SP_DialogHelpButton,  # actionLine_profiler_documentation
+    "INFO": QtWidgets.QStyle.SP_MessageBoxInformation,  # actionShowOutput
+    "ERROR": QtWidgets.QStyle.SP_MessageBoxCritical,  # actionShowOutput
+    "RUNNING": QtWidgets.QStyle.SP_BrowserReload,  # statusbar_running_indicator, actionShowOutput
 }
 
 ICONS = {}

@@ -303,7 +303,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def on_profileButton_clicked(self):
         self.accept()
-        self.parent().on_actionRun_triggered()
+        self.parent().profile()
 
     def update_profileButton_enabled(self):
         config = Config()

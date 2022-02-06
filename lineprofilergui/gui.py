@@ -21,37 +21,18 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     def setup_ui(self):
         # Main window
-        self.setObjectName("UI_MainWindow")
         # app.setWindowIcon(QIcon(_WINDOW_ICON))
         self.resize(800, 600)
-        self.centralwidget = QtWidgets.QWidget(self)
-        self.centralwidget.setObjectName("centralwidget")
-        self.centralLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.centralLayout.setContentsMargins(0, 6, 0, 0)
-        self.centralLayout.setObjectName("centralLayout")
-        self.setCentralWidget(self.centralwidget)
 
-        # Results tab
-        self.resultsTab = QtWidgets.QWidget()
-        self.resultsTab.setObjectName("resultsTab")
-        self.resultsTabLayout = QtWidgets.QVBoxLayout(self.resultsTab)
-        self.resultsTabLayout.setContentsMargins(0, 0, 0, 0)
-        self.resultsTabLayout.setObjectName("resultsTabLayout")
-        self.resultsTreeWidget = ResultsTreeWidget(self.resultsTab)
+        # Results widget
+        self.resultsTreeWidget = ResultsTreeWidget(self)
         self.resultsTreeWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.resultsTreeWidget.setObjectName("resultsTreeWidget")
-        self.resultsTabLayout.addWidget(self.resultsTreeWidget)
+        self.resultsTreeWidget.setMinimumSize(300, 50)
+        self.setCentralWidget(self.resultsTreeWidget)
 
-        # Output tab
-        self.outputTab = QtWidgets.QWidget()
-        self.outputTab.setObjectName("outputTab")
-        self.outputTabLayout = QtWidgets.QVBoxLayout(self.outputTab)
-        self.outputTabLayout.setContentsMargins(0, 0, 0, 0)
-        self.outputTabLayout.setObjectName("outputTabLayout")
-        self.outputWidget = QtWidgets.QPlainTextEdit(self.outputTab)
+        # Output widget
+        self.outputWidget = QtWidgets.QPlainTextEdit()
         self.outputWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.outputWidget.setTabChangesFocus(True)
-        self.outputWidget.setUndoRedoEnabled(False)
         self.outputWidget.setReadOnly(True)
         self.outputWidget.setTextInteractionFlags(
             QtCore.Qt.LinksAccessibleByKeyboard
@@ -61,72 +42,54 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             | QtCore.Qt.TextSelectableByMouse
         )
         self.outputWidget.setFont(MONOSPACE_FONT)
-        self.outputWidget.setObjectName("outputWidget")
-        self.outputTabLayout.addWidget(self.outputWidget)
-
-        # Tab widget
-        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setObjectName("tabWidget")
-        self.tabWidget.addTab(self.resultsTab, "")
-        self.tabWidget.addTab(self.outputTab, "")
-        self.tabWidget.setCurrentIndex(0)
-        self.centralLayout.addWidget(self.tabWidget)
+        self.outputWidget.setMinimumSize(300, 50)
+        self.dockOutputWidget = QtWidgets.QDockWidget(self)
+        self.dockOutputWidget.setWidget(self.outputWidget)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.dockOutputWidget)
 
         # Actions
         self.actionCollapse_all = QtWidgets.QAction(self)
         self.actionCollapse_all.setIcon(ICONS["COLLAPSE"])
-        self.actionCollapse_all.setObjectName("actionCollapse_all")
         self.actionExpand_all = QtWidgets.QAction(self)
         self.actionExpand_all.setIcon(ICONS["EXPAND"])
-        self.actionExpand_all.setObjectName("actionExpand_all")
         self.actionRun = QtWidgets.QAction(self)
         self.actionRun.setIcon(ICONS["START"])
-        self.actionRun.setObjectName("actionRun")
         self.actionAbort = QtWidgets.QAction(self)
         self.actionAbort.setIcon(ICONS["STOP"])
-        self.actionAbort.setObjectName("actionAbort")
+        self.actionShowOutput = self.dockOutputWidget.toggleViewAction()
+        self.actionShowOutput.setIcon(ICONS["INFO"])
         self.actionQuit = QtWidgets.QAction(self)
         self.actionQuit.setIcon(ICONS["ABORT"])
-        self.actionQuit.setObjectName("actionQuit")
         self.actionConfigure = QtWidgets.QAction(self)
         self.actionConfigure.setIcon(ICONS["CONFIG"])
-        self.actionConfigure.setObjectName("actionConfigure")
         self.actionLine_profiler_documentation = QtWidgets.QAction(self)
         self.actionLine_profiler_documentation.setIcon(ICONS["HELP"])
-        self.actionLine_profiler_documentation.setObjectName(
-            "actionLine_profiler_documentation"
-        )
         self.actionAbout_Qt = QtWidgets.QAction(self)
         self.actionAbout_Qt.setIcon(ICONS["QT"])
-        self.actionAbout_Qt.setObjectName("actionAbout_Qt")
 
         # Menu bar
         self.menubar = QtWidgets.QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
         self.setMenuBar(self.menubar)
 
         # Profiling menu
         self.menuProfiling = QtWidgets.QMenu(self.menubar)
-        self.menuProfiling.setObjectName("menuProfiling")
         self.menuProfiling.addAction(self.actionConfigure)
         self.menuProfiling.addSeparator()
         self.menuProfiling.addAction(self.actionRun)
         self.menuProfiling.addAction(self.actionAbort)
+        self.menuProfiling.addAction(self.actionShowOutput)
         self.menuProfiling.addSeparator()
         self.menuProfiling.addAction(self.actionQuit)
         self.menubar.addAction(self.menuProfiling.menuAction())
 
         # Display Menu
         self.menuDisplay = QtWidgets.QMenu(self.menubar)
-        self.menuDisplay.setObjectName("menuDisplay")
         self.menuDisplay.addAction(self.actionCollapse_all)
         self.menuDisplay.addAction(self.actionExpand_all)
         self.menubar.addAction(self.menuDisplay.menuAction())
 
         # Help Menu
         self.menuHelp = QtWidgets.QMenu(self.menubar)
-        self.menuHelp.setObjectName("menuHelp")
         self.menuHelp.addAction(self.actionLine_profiler_documentation)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout_Qt)
@@ -134,23 +97,22 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Toolbar
         self.toolBar = QtWidgets.QToolBar(self)
-        self.toolBar.setObjectName("toolBar")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.toolBar.addAction(self.actionConfigure)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionRun)
         self.toolBar.addAction(self.actionAbort)
+        self.toolBar.addAction(self.actionShowOutput)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionCollapse_all)
         self.toolBar.addAction(self.actionExpand_all)
 
         # Statusbar
         self.statusbar = QtWidgets.QStatusBar(self)
-        self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
         self.statusbar_running_indicator = QtWidgets.QLabel()
         self.statusbar_running_indicator.setPixmap(PIXMAPS["RUNNING"])
-        self.statusbar_running_indicator.setVisible(False)
+        self.statusbar_running_indicator.hide()
         self.statusbar_running_indicator_timer = QtCore.QTimer(self)
         self.statusbar_running_indicator_timer.timeout.connect(
             lambda: self.statusbar_running_indicator.setVisible(
@@ -164,10 +126,12 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.set_running_state(False)
 
     def connect(self):
-        QtCore.QMetaObject.connectSlotsByName(self)
         self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
         self.actionExpand_all.triggered.connect(self.resultsTreeWidget.expandAll)
+        self.actionConfigure.triggered.connect(self.configure)
+        self.actionRun.triggered.connect(self.profile)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
+        self.actionShowOutput.toggled.connect(self.outputWidget.setVisible)
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionLine_profiler_documentation.triggered.connect(
             lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl(LINE_PROFILER_DOC_URL))
@@ -178,26 +142,22 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     def retranslate_ui(self):
         self.update_window_title()
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.resultsTab), _("Profiling results"),
-        )
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.outputTab), _("Script Output"),
-        )
+        self.toolBar.setWindowTitle(_("Tool bar"))
+        self.dockOutputWidget.setWindowTitle(_("Console output"))
         self.menuDisplay.setTitle(_("&Display"))
         self.menuProfiling.setTitle(_("&Profiling"))
         self.menuHelp.setTitle(_("&Help"))
-        self.toolBar.setWindowTitle(_("toolBar"))
         self.actionCollapse_all.setText(_("&Collapse all"))
         self.actionExpand_all.setText(_("&Expand all"))
         self.actionRun.setText(_("&Profile"))
         self.actionRun.setShortcut(_("F5"))
         self.actionAbort.setText(_("&Stop"))
         self.actionAbort.setShortcut(_("F6"))
+        self.actionShowOutput.setText(_("&Console output"))
+        self.actionShowOutput.setShortcut(_("F7"))
         self.actionQuit.setText(_("&Quit"))
         self.actionQuit.setShortcut(_("Ctrl+Q"))
         self.actionConfigure.setText(_("&Configuration..."))
-        self.actionConfigure.setToolTip(_("Configuration"))
         self.actionConfigure.setShortcut(_("Ctrl+O"))
         self.actionLine_profiler_documentation.setText(
             _("&Line profiler documentation...")
@@ -212,15 +172,15 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle(title)
 
     @QtCore.Slot()
-    def on_actionConfigure_triggered(self):
+    def configure(self):
         Ui_ConfigDialog(self, self.config).exec()
         self.update_window_title()
 
     @QtCore.Slot()
-    def on_actionRun_triggered(self):
+    def profile(self):
         # Configuration dialog in case of invalid config
         if not self.config.isvalid:
-            self.on_actionConfigure_triggered()
+            self.configure()
             if not self.config.isvalid:
                 return
 
@@ -240,9 +200,11 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         if running:
             self.setCursor(Qt.WaitCursor)
             self.statusbar_running_indicator_timer.start(800)
+            self.actionShowOutput.setIcon(ICONS["RUNNING"])
         else:
             self.unsetCursor()
             self.statusbar_running_indicator_timer.stop()
+            # self.actionShowOutput is set in self.process_finished()
 
     @QtCore.Slot(str)
     def append_log_text(self, text):
@@ -252,8 +214,15 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     def append_log_error(self, text):
         self.outputWidget.appendHtml(f'<p style="color:red;white-space:pre">{text}</p>')
 
-    @QtCore.Slot()
-    def process_finished(self):
+    @QtCore.Slot(int, QtCore.QProcess.ExitStatus)
+    def process_finished(self, exit_code, exit_status):
+        if exit_code or exit_status:
+            self.dockOutputWidget.show()
+            self.dockOutputWidget.activateWindow()
+            self.outputWidget.setFocus(Qt.OtherFocusReason)
+            self.actionShowOutput.setIcon(ICONS["ERROR"])
+        else:
+            self.actionShowOutput.setIcon(ICONS["INFO"])
         self.resultsTreeWidget.load_data(self.config.stats)
 
 
@@ -269,11 +238,11 @@ def create_app(options):
         win.config.build_simple_config(options.script, options.args, options.outfile)
         win.update_window_title()
         if options.run:
-            win.on_actionRun_triggered()
+            win.profile()
         else:
-            win.on_actionConfigure_triggered()
+            win.configure()
     else:
-        win.on_actionConfigure_triggered()
+        win.configure()
 
     # Keep a reference to the win object to avoid destruction
     app.win = win

@@ -38,7 +38,14 @@ def wont_run(n):
 
 
 @profile
-def sum_(n):
+def sum_(
+    n,
+    this_very_long_argument_list,
+    and_this_one,
+    and_another_one,
+    this_is_the_last_one_i_promise,
+    ___i_m_sorry,
+):
     result = 0
 
     for i in range(1, n + 1):
@@ -48,7 +55,7 @@ def sum_(n):
 
 if __name__ == "__main__":
     print(fact(120))
-    print(sum_(120))
+    print(sum_(120, 0, 0, 0, 0, 0))
     print(script2.fact2(120))
     print(script2.sum2(120))
     pprint(dict(os.environ))

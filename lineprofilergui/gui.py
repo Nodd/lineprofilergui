@@ -208,6 +208,9 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             self.statusbar_running_indicator_timer.start(800)
             self.actionShowOutput.setIcon(ICONS["RUNNING"])
             self.dockOutputWidget.setWindowTitle(_("{} Console output").format("🔄"))
+            # self.dockOutputWidget.setWindowTitle() overrides the action text
+            # We reset it without the icon to avoid a ugly menu entry
+            self.actionShowOutput.setText(_("&Console output"))
         else:
             self.unsetCursor()
             self.statusbar_running_indicator_timer.stop()
@@ -232,6 +235,9 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         else:
             self.actionShowOutput.setIcon(ICONS["INFO"])
             self.dockOutputWidget.setWindowTitle(_("{} Console output").format("ⓘ"))
+        # self.dockOutputWidget.setWindowTitle() overrides the action text
+        # We reset it without the icon to avoid a ugly menu entry
+        self.actionShowOutput.setText(_("&Console output"))
         self.resultsTreeWidget.load_data(self.config.stats)
 
     @QtCore.Slot(str)

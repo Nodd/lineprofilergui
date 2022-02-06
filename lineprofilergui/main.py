@@ -29,9 +29,9 @@ def commandline_args():
     )
 
     # TODO
-    parser.add_argument(
-        "-s", "--setup", help="Python script to execute before the code to profile"
-    )
+    # parser.add_argument(
+    #     "-s", "--setup", help="Python script to execute before the code to profile"
+    # )
 
     parser.add_argument("script", nargs="?", help="The python script file to run")
     parser.add_argument("args", nargs="...", help="Optional script arguments")

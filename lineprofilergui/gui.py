@@ -1,9 +1,10 @@
 from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
 
 from .config import Config, Ui_ConfigDialog
 from .tree import ResultsTreeWidget
-from .utils import translate as _, MONOSPACE_FONT, _icons_factory, ICONS
+from .utils import translate as _, MONOSPACE_FONT, _icons_factory, ICONS, PIXMAPS
 from .process import KernprofRun
 
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
@@ -147,6 +148,16 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
+        self.statusbar_running_indicator = QtWidgets.QLabel()
+        self.statusbar_running_indicator.setPixmap(PIXMAPS["RUNNING"])
+        self.statusbar_running_indicator.setVisible(False)
+        self.statusbar_running_indicator_timer = QtCore.QTimer(self)
+        self.statusbar_running_indicator_timer.timeout.connect(
+            lambda: self.statusbar_running_indicator.setVisible(
+                not self.statusbar_running_indicator.isVisible()
+            )
+        )
+        self.statusbar.addPermanentWidget(self.statusbar_running_indicator)
 
         # Finalization
         self.retranslate_ui()
@@ -225,6 +236,13 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionRun.setEnabled(not running)
         self.actionAbort.setEnabled(running)
         self.actionConfigure.setEnabled(not running)
+        self.statusbar_running_indicator.setVisible(running)
+        if running:
+            self.setCursor(Qt.WaitCursor)
+            self.statusbar_running_indicator_timer.start(800)
+        else:
+            self.unsetCursor()
+            self.statusbar_running_indicator_timer.stop()
 
     @QtCore.Slot(str)
     def append_log_text(self, text):

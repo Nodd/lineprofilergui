@@ -25,6 +25,7 @@ _ICON_IDS = {
     "HELP": QtWidgets.QStyle.SP_MessageBoxQuestion,  # actionLine_profiler_documentation
     "INFO": QtWidgets.QStyle.SP_MessageBoxInformation,
     "BUG": QtWidgets.QStyle.SP_MessageBoxCritical,
+    "RUNNING": QtWidgets.QStyle.SP_BrowserReload,  # statusbar_running_indicator
 }
 
 ICONS = {}

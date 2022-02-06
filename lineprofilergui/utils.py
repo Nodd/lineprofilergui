@@ -10,19 +10,21 @@ MONOSPACE_FONT.setStyleHint(QtGui.QFont.Monospace)
 MONOSPACE_FONT.setPointSize(9)
 
 _ICON_IDS = {
-    "OK": QtWidgets.QStyle.SP_DialogApplyButton,
-    "NOK": QtWidgets.QStyle.SP_DialogCancelButton,
-    "START": QtWidgets.QStyle.SP_MediaPlay,
-    "STOP": QtWidgets.QStyle.SP_MediaStop,
-    "ABORT": QtWidgets.QStyle.SP_BrowserStop,
-    "CONFIG": QtWidgets.QStyle.SP_FileDialogDetailedView,
-    "FILE": QtWidgets.QStyle.SP_FileIcon,
-    "DIRECTORY": QtWidgets.QStyle.SP_DirIcon,
-    "EXPAND": QtWidgets.QStyle.SP_ToolBarVerticalExtensionButton,
-    "COLLAPSE": QtWidgets.QStyle.SP_ToolBarHorizontalExtensionButton,
-    "QT": QtWidgets.QStyle.SP_TitleBarMenuButton,
-    "HELP": QtWidgets.QStyle.SP_MessageBoxQuestion,
+    "OK": QtWidgets.QStyle.SP_DialogApplyButton,  # Icon valid field
+    "NOK": QtWidgets.QStyle.SP_DialogCancelButton,  # Icon invalid field
+    "START": QtWidgets.QStyle.SP_MediaPlay,  # actionRun
+    "STOP": QtWidgets.QStyle.SP_MediaStop,  # actionAbort
+    "ABORT": QtWidgets.QStyle.SP_BrowserStop,  # actionQuit
+    "CONFIG": QtWidgets.QStyle.SP_FileDialogDetailedView,  # actionConfigure
+    "BLANKFILE": QtWidgets.QStyle.SP_FileIcon,  # statsButton
+    "READFILE": QtWidgets.QStyle.SP_FileDialogContentsView,  # scriptButton, kernprofButton
+    "DIRECTORY": QtWidgets.QStyle.SP_DirIcon,  # wdirButton
+    "EXPAND": QtWidgets.QStyle.SP_ToolBarVerticalExtensionButton,  # actionExpand_all
+    "COLLAPSE": QtWidgets.QStyle.SP_ToolBarHorizontalExtensionButton,  # actionCollapse_all
+    "QT": QtWidgets.QStyle.SP_TitleBarMenuButton,  # actionAbout_Qt
+    "HELP": QtWidgets.QStyle.SP_MessageBoxQuestion,  # actionLine_profiler_documentation
     "INFO": QtWidgets.QStyle.SP_MessageBoxInformation,
+    "BUG": QtWidgets.QStyle.SP_MessageBoxCritical,
 }
 
 ICONS = {}

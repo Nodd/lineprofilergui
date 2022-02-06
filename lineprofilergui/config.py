@@ -8,7 +8,7 @@ from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
 
 
-from .utils import translate as _, MONOSPACE_FONT, PIXMAPS
+from .utils import translate as _, MONOSPACE_FONT, PIXMAPS, ICONS
 
 
 class Config:
@@ -171,6 +171,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirStatusLabel = QtWidgets.QLabel(self)
         self.wdirLayout.addWidget(self.wdirStatusLabel)
         self.wdirButton = QtWidgets.QPushButton(self)
+        self.wdirButton.setIcon(ICONS["DIRECTORY"])
         self.wdirButton.setObjectName("wdirButton")
         self.wdirLayout.addWidget(self.wdirButton)
         self.configLayout.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.wdirLayout)
@@ -188,6 +189,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.scriptStatusLabel = QtWidgets.QLabel(self)
         self.scriptLayout.addWidget(self.scriptStatusLabel)
         self.scriptButton = QtWidgets.QPushButton(self)
+        self.scriptButton.setIcon(ICONS["READFILE"])
         self.scriptButton.setObjectName("scriptButton")
         self.scriptLayout.addWidget(self.scriptButton)
         self.configLayout.setLayout(
@@ -225,6 +227,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.statsStatusLabel = QtWidgets.QLabel(self)
         self.statsLayout.addWidget(self.statsStatusLabel)
         self.statsButton = QtWidgets.QPushButton(self)
+        self.statsButton.setIcon(ICONS["BLANKFILE"])
         self.statsButton.setObjectName("statsButton")
         self.statsLayout.addWidget(self.statsButton)
         self.configLayout.setLayout(
@@ -244,6 +247,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.kernprofStatusLabel = QtWidgets.QLabel(self)
         self.kernprofLayout.addWidget(self.kernprofStatusLabel)
         self.kernprofButton = QtWidgets.QPushButton(self)
+        self.kernprofButton.setIcon(ICONS["READFILE"])
         self.kernprofButton.setObjectName("kernprofButton")
         self.kernprofLayout.addWidget(self.kernprofButton)
         self.configLayout.setLayout(

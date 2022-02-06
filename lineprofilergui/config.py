@@ -20,13 +20,13 @@ class Config:
         self.config_stats = None
         self.config_kernprof = None
 
-    def build_simple_config(self, script, args):
+    def build_simple_config(self, script, args="", stats=None):
         self.script = script
         self.args = args
+        self.config_stats = stats
 
         self.config_wdir = None
         self.config_env = ""
-        self.config_stats = None
         self.config_kernprof = None
 
     @property
@@ -66,7 +66,12 @@ class Config:
 
     @property
     def isvalid_stats(self):
-        return not self.config_stats or Path(self.config_stats).parent.isdir()
+        if not self.config_stats:
+            return True
+        return (
+            not self.config_stats.endswith(("/", "\\"))
+            and Path(self.config_stats).parent.is_dir()
+        )
 
     @property
     def kernprof(self):

@@ -248,7 +248,7 @@ def create_app(options):
     win = UI_MainWindow()
     win.show()
     if options.script:
-        win.config.build_simple_config(options.script, options.args)
+        win.config.build_simple_config(options.script, options.args, options.outfile)
         win.update_window_title()
         if options.run:
             win.on_actionRun_triggered()

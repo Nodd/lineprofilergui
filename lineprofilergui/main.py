@@ -18,15 +18,17 @@ def commandline_args():
     parser = argparse.ArgumentParser(
         description="Run, profile a python script and display results."
     )
-    parser.add_argument("-V", "--version", action="version", version=__version__)
+    parser.add_argument(
+        "-V", "--version", action="version", version=f"%(prog)s v{__version__}"
+    )
     parser.add_argument(
         "-r", "--run", action="store_true", help="Profile the python script on launch"
     )
+    parser.add_argument(
+        "-o", "--outfile", help="Save stats to OUTFILE (default: 'scriptname.lprof')"
+    )
 
     # TODO
-    parser.add_argument(
-        "-o", "--outfile", help="Save stats to <outfile> (default: 'scriptname.lprof')"
-    )
     parser.add_argument(
         "-s", "--setup", help="Code to execute before the code to profile"
     )

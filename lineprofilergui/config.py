@@ -31,7 +31,7 @@ class Config:
 
     @property
     def isvalid_wdir(self):
-        return not self.config_wdir or Path(self.config_wdir).isdir()
+        return not self.config_wdir or Path(self.config_wdir).is_dir()
 
     @property
     def isvalid_script(self):

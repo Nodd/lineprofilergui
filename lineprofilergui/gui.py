@@ -100,7 +100,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Toolbar
         self.toolBar = QtWidgets.QToolBar(self)
-        self.dockOutputWidget.setObjectName("toolBar")
+        self.toolBar.setObjectName("toolBar")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.toolBar.addAction(self.actionConfigure)
         self.toolBar.addSeparator()

@@ -66,7 +66,7 @@ class FunctionData:
         next_stat_index = 0
         for line_no, code_line in enumerate(self.code_lines):
             line_no += self.start_line_no + 1  # Lines start at 1
-            code_line = code_line.rstrip("\n")
+            code_line = code_line.rstrip()
 
             # stats contains data for runned lines only : (line_no, hits, total_time)
             if next_stat_index >= len(stats) or line_no != stats[next_stat_index][0]:
@@ -198,13 +198,11 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
         if self.topLevelItemCount() > 1:
             self.lock_expanded_tracking = True
-            self.collapseAll()
             root = self.invisibleRootItem()
             for index in range(root.childCount()):
                 item = root.child(index)
                 func_id = item.data(self.COL_FILE_LINE, Qt.UserRole)
-                if func_id in self.expanded_functions:
-                    item.setExpanded(True)
+                item.setExpanded(func_id in self.expanded_functions)
             self.lock_expanded_tracking = False
 
     def populate_tree(self, profiledata):

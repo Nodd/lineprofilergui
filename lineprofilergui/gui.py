@@ -39,7 +39,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Output widget
         self.dockOutputWidget = DockOutputWidget(self)
-        self.addDockWidget(self.dockOutputWidget.area, self.dockOutputWidget)
+        self.dockOutputWidget.setObjectName("dockOutputWidget")
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.dockOutputWidget)
 
         # Actions
         self.actionCollapse_all = QtWidgets.QAction(self)
@@ -99,6 +100,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Toolbar
         self.toolBar = QtWidgets.QToolBar(self)
+        self.dockOutputWidget.setObjectName("toolBar")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.toolBar.addAction(self.actionConfigure)
         self.toolBar.addSeparator()
@@ -133,6 +135,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         # Finalization
         self.retranslate_ui()
+        self.read_settings()
         self.set_running_state(False)
 
     def connect(self):
@@ -186,6 +189,24 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         if self.config.script:
             title += f" - {self.config.script}"
         self.setWindowTitle(title)
+
+    def closeEvent(self, event):
+        self.write_settings()
+        QtWidgets.QMainWindow.closeEvent(self, event)
+
+    def write_settings(self):
+        settings = QtCore.QSettings()
+        settings.beginGroup("MainWindow")
+        settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("state", self.saveState())
+        settings.endGroup()
+
+    def read_settings(self):
+        settings = QtCore.QSettings()
+        settings.beginGroup("MainWindow")
+        self.restoreGeometry(settings.value("geometry", type=QtCore.QByteArray))
+        self.restoreState(settings.value("state", type=QtCore.QByteArray))
+        settings.endGroup()
 
     @QtCore.Slot()
     def selectLprof(self):
@@ -271,11 +292,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 class DockOutputWidget(QtWidgets.QDockWidget):
     def __init__(self, parent):
         QtWidgets.QDockWidget.__init__(self, parent)
-        self.initialized = False
         self.setup_ui()
-        self.load_settings()
-        self.initialized = True
-        self.connect()
 
     def setup_ui(self):
         # Console ouput widget
@@ -292,54 +309,6 @@ class DockOutputWidget(QtWidgets.QDockWidget):
         self.outputWidget.setFont(MONOSPACE_FONT)
         self.outputWidget.setMinimumSize(300, 50)
         self.setWidget(self.outputWidget)
-
-    def load_settings(self):
-        settings = QtCore.QSettings()
-
-        # Floating status
-        floating = settings.value("dockOutputWidget/floating", False, bool)
-        self.setFloating(floating)
-
-        # Size
-        key = "floating" if floating else "docked"
-        size = settings.value("dockOutputWidget/size/" + key, None, QtCore.QSize)
-        if size is not None:
-            self.resize(size)
-
-        # Visible
-        self.setVisible(settings.value("dockOutputWidget/visible", True, bool))
-
-    @property
-    def area(self):
-        return QtCore.QSettings().value(
-            "dockOutputWidget/area", Qt.BottomDockWidgetArea, Qt.DockWidgetArea
-        )
-
-    def connect(self):
-        self.dockLocationChanged.connect(
-            lambda area: QtCore.QSettings().setValue("dockOutputWidget/area", area)
-        )
-        self.topLevelChanged.connect(
-            lambda floating: QtCore.QSettings().setValue(
-                "dockOutputWidget/floating", floating
-            )
-        )
-
-    def resizeEvent(self, event):
-        QtWidgets.QDockWidget.resizeEvent(self, event)
-        if self.initialized:
-            key = "floating" if self.isFloating() else "docked"
-            QtCore.QSettings().setValue("dockOutputWidget/size/" + key, event.size())
-
-    def showEvent(self, event):
-        QtWidgets.QDockWidget.showEvent(self, event)
-        if self.initialized:
-            QtCore.QSettings().setValue("dockOutputWidget/visible", True)
-
-    def hideEvent(self, event):
-        QtWidgets.QDockWidget.hideEvent(self, event)
-        if self.initialized:
-            QtCore.QSettings().setValue("dockOutputWidget/visible", False)
 
     def set_running_state(self, running):
         actionShowOutput = self.toggleViewAction()

@@ -5,8 +5,8 @@ from .utils import translate as _
 EDITOR_COMMAND_EXAMPLES = [
     "",
     "code --goto {file}:{line}",
-    "vim +{line} {file}",
     '"C:\\\\Program Files (x86)\\\\Notepad++\\\\Notepad++" {file} -n{line}',
+    "vim +{line} {file}",
 ]
 
 

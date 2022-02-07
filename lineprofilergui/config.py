@@ -16,17 +16,9 @@ class Config:
         self.config_wdir = None
         self.script = None
         self.args = ""
+        self.warmup = None
         self.config_env = ""
         self.config_stats = None
-        self.config_kernprof = None
-
-    def build_simple_config(self, script, args="", stats=None):
-        self.script = script
-        self.args = args
-        self.config_stats = stats
-
-        self.config_wdir = None
-        self.config_env = ""
         self.config_kernprof = None
 
     @property
@@ -49,6 +41,15 @@ class Config:
         # or relative to the working directory
         script_path = Path(self.config_wdir or "") / Path(self.script)
         return script_path.is_file()
+
+    @property
+    def isvalid_warmup(self):
+        if not self.warmup:
+            return True
+        # Script file must exist, either as an ablsolute path,
+        # or relative to the working directory
+        warmup_path = Path(self.config_wdir or "") / Path(self.warmup)
+        return warmup_path.is_file()
 
     @property
     def stats(self):
@@ -107,6 +108,7 @@ class Config:
         return bool(
             self.isvalid_wdir
             and self.isvalid_script
+            and self.isvalid_warmup
             and self.isvalid_stats
             and self.isvalid_kernprof
             and self.isvalid_env
@@ -126,6 +128,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirWidget.setText(self.config.config_wdir)
         self.scriptWidget.setText(self.config.script)
         self.argsWidget.setText(self.config.args)
+        self.warmupWidget.setText(self.config.warmup)
         self.envWidget.setText(self.config.config_env)
         self.statsWidget.setText(self.config.config_stats)
         self.kernprofWidget.setText(self.config.config_kernprof)
@@ -138,6 +141,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         config.config_wdir = self.wdirWidget.text() or None
         config.script = self.scriptWidget.text() or None
         config.args = self.argsWidget.text()
+        config.warmup = self.warmupWidget.text() or None
         config.config_env = self.envWidget.text()
         config.config_stats = self.statsWidget.text() or None
         config.config_kernprof = self.kernprofWidget.text() or None
@@ -148,6 +152,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.kernprofWidget.setPlaceholderText(self.config.default_kernprof)
         self.on_wdirWidget_textChanged("")
         self.on_scriptWidget_textChanged("")
+        self.on_warmupWidget_textChanged("")
         self.on_statsWidget_textChanged("")
         self.on_kernprofWidget_textChanged("")
         self.on_envWidget_textChanged("")
@@ -165,10 +170,13 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.configLayout = QtWidgets.QFormLayout(self)
         self.configLayout.setObjectName("configLayout")
+        row = 0
 
         # Working directory
         self.wdirLabel = QtWidgets.QLabel(self)
-        self.configLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.wdirLabel)
+        self.configLayout.setWidget(
+            row, QtWidgets.QFormLayout.LabelRole, self.wdirLabel
+        )
         self.wdirLayout = QtWidgets.QHBoxLayout()
         self.wdirWidget = QtWidgets.QLineEdit(self)
         self.wdirWidget.setObjectName("wdirWidget")
@@ -179,13 +187,16 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirButton.setIcon(ICONS["DIRECTORY"])
         self.wdirButton.setObjectName("wdirButton")
         self.wdirLayout.addWidget(self.wdirButton)
-        self.configLayout.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.wdirLayout)
+        self.configLayout.setLayout(
+            row, QtWidgets.QFormLayout.FieldRole, self.wdirLayout
+        )
         self.wdirWidget.setValidator(ConfigValidator(self, "wdir"))
+        row += 1
 
         # Python script
         self.scriptLabel = QtWidgets.QLabel(self)
         self.configLayout.setWidget(
-            1, QtWidgets.QFormLayout.LabelRole, self.scriptLabel
+            row, QtWidgets.QFormLayout.LabelRole, self.scriptLabel
         )
         self.scriptLayout = QtWidgets.QHBoxLayout()
         self.scriptWidget = QtWidgets.QLineEdit(self)
@@ -198,9 +209,10 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.scriptButton.setObjectName("scriptButton")
         self.scriptLayout.addWidget(self.scriptButton)
         self.configLayout.setLayout(
-            1, QtWidgets.QFormLayout.FieldRole, self.scriptLayout
+            row, QtWidgets.QFormLayout.FieldRole, self.scriptLayout
         )
         self.scriptWidget.setValidator(ConfigValidator(self, "script"))
+        row += 1
 
         # Scripts args
         self.argsLabel = QtWidgets.QLabel(self)
@@ -209,22 +221,49 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.argsWidget.setFont(MONOSPACE_FONT)
         self.argsWidget.setObjectName("argsWidget")
         self.configLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.argsWidget)
+        row += 1
+
+        # Python script
+        self.warmupLabel = QtWidgets.QLabel(self)
+        self.configLayout.setWidget(
+            row, QtWidgets.QFormLayout.LabelRole, self.warmupLabel
+        )
+        self.warmupLayout = QtWidgets.QHBoxLayout()
+        self.warmupWidget = QtWidgets.QLineEdit(self)
+        self.warmupWidget.setObjectName("warmupWidget")
+        self.warmupLayout.addWidget(self.warmupWidget)
+        self.warmupStatusLabel = QtWidgets.QLabel(self)
+        self.warmupLayout.addWidget(self.warmupStatusLabel)
+        self.warmupButton = QtWidgets.QPushButton(self)
+        self.warmupButton.setIcon(ICONS["READFILE"])
+        self.warmupButton.setObjectName("warmupButton")
+        self.warmupLayout.addWidget(self.warmupButton)
+        self.configLayout.setLayout(
+            row, QtWidgets.QFormLayout.FieldRole, self.warmupLayout
+        )
+        self.warmupWidget.setValidator(ConfigValidator(self, "warmup"))
+        row += 1
 
         # Environment variables
         self.envLabel = QtWidgets.QLabel(self)
-        self.configLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.envLabel)
+        self.configLayout.setWidget(row, QtWidgets.QFormLayout.LabelRole, self.envLabel)
         self.envLayout = QtWidgets.QHBoxLayout()
         self.envWidget = QtWidgets.QLineEdit(self)
         self.envWidget.setObjectName("envWidget")
         self.envLayout.addWidget(self.envWidget)
         self.envStatusLabel = QtWidgets.QLabel(self)
         self.envLayout.addWidget(self.envStatusLabel)
-        self.configLayout.setLayout(3, QtWidgets.QFormLayout.FieldRole, self.envLayout)
+        self.configLayout.setLayout(
+            row, QtWidgets.QFormLayout.FieldRole, self.envLayout
+        )
         self.envWidget.setValidator(ConfigValidator(self, "env"))
+        row += 1
 
         # Stats filename
         self.statsLabel = QtWidgets.QLabel(self)
-        self.configLayout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.statsLabel)
+        self.configLayout.setWidget(
+            row, QtWidgets.QFormLayout.LabelRole, self.statsLabel
+        )
         self.statsLayout = QtWidgets.QHBoxLayout()
         self.statsWidget = QtWidgets.QLineEdit(self)
         self.statsWidget.setObjectName("statsWidget")
@@ -236,14 +275,15 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.statsButton.setObjectName("statsButton")
         self.statsLayout.addWidget(self.statsButton)
         self.configLayout.setLayout(
-            4, QtWidgets.QFormLayout.FieldRole, self.statsLayout
+            row, QtWidgets.QFormLayout.FieldRole, self.statsLayout
         )
         self.statsWidget.setValidator(ConfigValidator(self, "stats"))
+        row += 1
 
         # kernprof executable
         self.kernprofLabel = QtWidgets.QLabel(self)
         self.configLayout.setWidget(
-            5, QtWidgets.QFormLayout.LabelRole, self.kernprofLabel
+            row, QtWidgets.QFormLayout.LabelRole, self.kernprofLabel
         )
         self.kernprofLayout = QtWidgets.QHBoxLayout()
         self.kernprofWidget = QtWidgets.QLineEdit(self)
@@ -256,9 +296,10 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.kernprofButton.setObjectName("kernprofButton")
         self.kernprofLayout.addWidget(self.kernprofButton)
         self.configLayout.setLayout(
-            5, QtWidgets.QFormLayout.FieldRole, self.kernprofLayout
+            row, QtWidgets.QFormLayout.FieldRole, self.kernprofLayout
         )
         self.kernprofWidget.setValidator(ConfigValidator(self, "kernprof"))
+        row += 1
 
         # Buttons
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
@@ -272,10 +313,11 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         )
         self.buttonBox.setObjectName("buttonBox")
         self.configLayout.setWidget(
-            6, QtWidgets.QFormLayout.SpanningRole, self.buttonBox
+            row, QtWidgets.QFormLayout.SpanningRole, self.buttonBox
         )
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
+        row += 1
 
         # Finalization
         self.retranslate_ui()
@@ -287,6 +329,8 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirButton.setText(_("Select..."))
         self.scriptLabel.setText(_("Python script"))
         self.scriptButton.setText(_("Select..."))
+        self.warmupLabel.setText(_("Warm up script"))
+        self.warmupButton.setText(_("Select..."))
         self.argsLabel.setText(_("Script args"))
         self.envLabel.setText(_("Environment variables"))
         self.statsLabel.setText(_("Stats filename"))
@@ -332,6 +376,10 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.update_stats_placeholder()
 
     @QtCore.Slot(str)
+    def on_warmupWidget_textChanged(self, text):
+        self.display_status(self.warmupWidget, self.warmupStatusLabel)
+
+    @QtCore.Slot(str)
     def on_statsWidget_textChanged(self, text):
         self.display_status(self.statsWidget, self.statsStatusLabel)
 
@@ -353,6 +401,17 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         )
         if filename:
             self.scriptWidget.setText(filename)
+
+    @QtCore.Slot()
+    def on_warmupButton_clicked(self):
+        filename, _selfilter = qtcompat.getopenfilename(
+            self,
+            _("Select Python warmup script"),
+            self.warmupWidget.text(),
+            _("Python scripts") + " (*.py ; *.pyw)",
+        )
+        if filename:
+            self.warmupWidget.setText(filename)
 
     @QtCore.Slot()
     def on_statsButton_clicked(self):

@@ -33,12 +33,18 @@ class KernprofRun(QtCore.QObject):
 
         self.process.setWorkingDirectory(self.config.wdir)
         filename = self.config.script
+        warmup = self.config.warmup
         if os.name == "nt":
             # On Windows, one has to replace backslashes by slashes to avoid
             # confusion with escape characters (otherwise, for example, '\t'
             # will be interpreted as a tabulation):
             filename = os.path.normpath(filename).replace(os.sep, "/")
-        self.p_args = ["-l", "-o", self.config.stats, filename]
+            if warmup:
+                warmup = os.path.normpath(warmup).replace(os.sep, "/")
+        self.p_args = ["-l", "-o", self.config.stats]
+        if warmup:
+            self.p_args.extend(["--setup", warmup])
+        self.p_args.append(filename)
         if self.config.args:
             self.p_args.extend(shlex.split(self.config.args))
 

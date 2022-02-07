@@ -30,12 +30,9 @@ def commandline_args():
     parser.add_argument(
         "-o", "--outfile", help="Save stats to OUTFILE (default: 'scriptname.lprof')"
     )
-
-    # TODO
-    # parser.add_argument(
-    #     "-s", "--setup", help="Python script to execute before the code to profile"
-    # )
-
+    parser.add_argument(
+        "-s", "--setup", help="Python script to execute before the code to profile"
+    )
     parser.add_argument("script", nargs="?", help="The python script file to run")
     parser.add_argument("args", nargs="...", help="Optional script arguments")
 
@@ -60,8 +57,11 @@ def main():
     # Create main window
     win = UI_MainWindow()
     win.show()
+    win.config.script = options.script
+    win.config.args = options.args
+    win.config.warmup = options.setup
+    win.config.outfile = options.outfile
     if options.script:
-        win.config.build_simple_config(options.script, options.args, options.outfile)
         win.update_window_title()
         if options.run:
             win.profile()

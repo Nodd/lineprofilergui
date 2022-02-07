@@ -6,7 +6,7 @@ This is a Qt GUI for the `line-profiler <https://pypi.org/project/line_profiler/
 It allows to run and display the profiling results using an interactive interface.
 It is functionnaly equivalent to the ``kernprof`` script, which is used to invoque ``line_profiler`` from the command line.
 
-.. figure:: images/screenshot_main.png
+.. figure:: https://raw.githubusercontent.com/Nodd/lineprofilergui/master/images/screenshot_main.png
   :alt: Screenshot of Line Profier GUI main window
   :align: center
 
@@ -23,13 +23,13 @@ Features
 * **Viewer**: Display data from any .lprof file by ``kernprof``,
 * **Editor**: Double-click on any line to edit it with your favorite editor.
 
-.. figure:: images/screenshot_config.png
+.. figure:: https://raw.githubusercontent.com/Nodd/lineprofilergui/master/images/screenshot_config.png
   :alt: Screenshot of Line Profier GUI profiling configuration window
   :align: center
 
   Line Profier GUI profiling configuration window
 
-.. figure:: images/screenshot_settings.png
+.. figure:: https://raw.githubusercontent.com/Nodd/lineprofilergui/master/images/screenshot_settings.png
   :alt: Screenshot of Line Profier GUI application settings window
   :align: center
 

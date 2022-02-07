@@ -5,6 +5,7 @@ import hashlib
 import os
 import functools
 import math
+import subprocess
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
@@ -138,8 +139,6 @@ class LineData:
 class ResultsTreeWidget(QtWidgets.QTreeWidget):
     """Tree widget to view line_profiler results"""
 
-    goto_line = QtCore.Signal(str, int)  # Filename, line_no
-
     column_header_text = [
         _("Line #"),
         _("Hits"),
@@ -263,7 +262,37 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         font.setStyle(QtGui.QFont.StyleItalic)
         warn_item.setFont(self.COL_0, font)
 
+    def updateColonsVisible(self):
+        settings = QtCore.QSettings()
+        for col in range(5):
+            self.setColumnHidden(
+                col, not int(settings.value(f"column{col+1}Visible", 1))
+            )
+
     def item_activated(self, item):
-        if not item.isFirstColumnSpanned():  # Skip parent lines
-            filename, line_no = item.data(self.COL_FILE_LINE, Qt.UserRole)
-            self.goto_line.emit(filename, line_no)
+        # Skip parent lines
+        if item.isFirstColumnSpanned():
+            return
+
+        # Retrieve command
+        settings = QtCore.QSettings()
+        editor_command = settings.value("editorCommand", "").strip()
+        if not editor_command:
+            return
+
+        # Replace special values
+        filename, line_no = item.data(self.COL_FILE_LINE, Qt.UserRole)
+        filename = filename.replace("\\", "\\\\")
+        # fmt: off
+        editor_command = (
+            editor_command
+            .replace("{file}", f'"{filename}"')
+            .replace("{line}", str(line_no))
+        )
+        # fmt: on
+
+        # Run
+        try:
+            subprocess.Popen(editor_command, shell=False)
+        except FileNotFoundError:
+            subprocess.Popen(editor_command, shell=True)

@@ -6,6 +6,7 @@ import qtpy.compat as qtcompat
 
 from .config import Config, Ui_ConfigDialog
 from .tree import ResultsTreeWidget
+from .settings import UI_SettingsDialog
 from .utils import translate as _, MONOSPACE_FONT, _icons_factory, ICONS, PIXMAPS
 from .process import KernprofRun
 
@@ -66,6 +67,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionQuit.setIcon(ICONS["ABORT"])
         self.actionConfigure = QtWidgets.QAction(self)
         self.actionConfigure.setIcon(ICONS["CONFIG"])
+        self.actionSettings = QtWidgets.QAction(self)
+        self.actionSettings.setIcon(ICONS["SETTINGS"])
         self.actionLine_profiler_documentation = QtWidgets.QAction(self)
         self.actionLine_profiler_documentation.setIcon(ICONS["HELP"])
         self.actionAbout_Qt = QtWidgets.QAction(self)
@@ -90,6 +93,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.menuDisplay = QtWidgets.QMenu(self.menubar)
         self.menuDisplay.addAction(self.actionCollapse_all)
         self.menuDisplay.addAction(self.actionExpand_all)
+        self.menuDisplay.addSeparator()
+        self.menuDisplay.addAction(self.actionSettings)
         self.menubar.addAction(self.menuDisplay.menuAction())
 
         # Help Menu
@@ -127,6 +132,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.statusbar_time = QtWidgets.QLabel()
         self.statusbar.addWidget(self.statusbar_time)
 
+        self.settingsDialog = UI_SettingsDialog(self)
+
         # Finalization
         self.retranslate_ui()
         self.set_running_state(False)
@@ -135,6 +142,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
         self.actionExpand_all.triggered.connect(self.resultsTreeWidget.expandAll)
         self.actionConfigure.triggered.connect(self.configure)
+        self.actionSettings.triggered.connect(self.settingsDialog.show)
         self.actionRun.triggered.connect(self.profile)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
         self.actionShowOutput.toggled.connect(self.outputWidget.setVisible)
@@ -145,6 +153,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.kernprof_run.output_text.connect(self.append_log_text)
         self.kernprof_run.output_error.connect(self.append_log_error)
+        self.settingsDialog.accepted.connect(self.resultsTreeWidget.updateColonsVisible)
 
     def retranslate_ui(self):
         self.update_window_title()
@@ -164,6 +173,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionQuit.setShortcut(_("Ctrl+Q"))
         self.actionConfigure.setText(_("&Configuration..."))
         self.actionConfigure.setShortcut(_("Ctrl+O"))
+        self.actionSettings.setText(_("&Settings..."))
         self.actionLine_profiler_documentation.setText(
             _("&Line-profiler documentation...")
         )

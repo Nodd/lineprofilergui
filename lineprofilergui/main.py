@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from qtpy import QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from .gui import UI_MainWindow
 from .utils import _icons_factory
@@ -52,6 +52,10 @@ def main():
     # Create Qt application
     app = QtWidgets.QApplication([])
     _icons_factory()
+
+    # Used for QSettings
+    QtCore.QCoreApplication.setOrganizationName("OpenPyUtils")
+    QtCore.QCoreApplication.setApplicationName("Line Profiler Gui")
 
     # Create main window
     win = UI_MainWindow()

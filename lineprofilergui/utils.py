@@ -16,6 +16,7 @@ _ICON_IDS = {
     "STOP": QtWidgets.QStyle.SP_MediaStop,  # actionAbort
     "ABORT": QtWidgets.QStyle.SP_BrowserStop,  # actionQuit
     "CONFIG": QtWidgets.QStyle.SP_FileDialogDetailedView,  # actionConfigure
+    "SETTINGS": QtWidgets.QStyle.SP_FileDialogListView,  # actionSettings
     "BLANKFILE": QtWidgets.QStyle.SP_FileIcon,  # statsButton
     "READFILE": QtWidgets.QStyle.SP_FileDialogContentsView,  # scriptButton, kernprofButton
     "DIRECTORY": QtWidgets.QStyle.SP_DirIcon,  # wdirButton

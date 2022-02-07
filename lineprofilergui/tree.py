@@ -202,14 +202,19 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
             self.resizeColumnToContents(col)
 
         # Restore expanded state for each function
+        root = self.invisibleRootItem()
         if self.topLevelItemCount() > 1:
             self.lock_expanded_tracking = True
-            root = self.invisibleRootItem()
             for index in range(root.childCount()):
                 item = root.child(index)
                 func_id = item.data(self.COL_FILE_LINE, Qt.UserRole)
                 item.setExpanded(func_id in self.expanded_functions)
             self.lock_expanded_tracking = False
+        else:
+            # Since we forced the function to be expanded, store it for consistency
+            item = root.child(0)
+            func_id = item.data(self.COL_FILE_LINE, Qt.UserRole)
+            self.expanded_functions.add(func_id)
 
         # Restore scrollbar position
         scrollbar.setValue(scroll)

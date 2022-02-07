@@ -175,10 +175,12 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionAbort.setShortcut(_("F6"))
         self.actionShowOutput.setText(_("&Console output"))
         self.actionShowOutput.setShortcut(_("F7"))
+        self.actionLoadLprof.setText(_("&Load data..."))
+        self.actionLoadLprof.setShortcut(_("Ctrl+O"))
         self.actionQuit.setText(_("&Quit"))
         self.actionQuit.setShortcut(_("Ctrl+Q"))
         self.actionConfigure.setText(_("&Configuration..."))
-        self.actionConfigure.setShortcut(_("Ctrl+O"))
+        self.actionConfigure.setShortcut(_("F4"))
         self.actionSettings.setText(_("&Settings..."))
         self.actionLine_profiler_documentation.setText(
             _("&Line-profiler documentation...")

@@ -25,10 +25,13 @@ def commandline_args():
         "-V", "--version", action="version", version=f"%(prog)s v{__version__}"
     )
     parser.add_argument(
+        "-l", "--lprof", help="Display data from a .lprof file",
+    )
+    parser.add_argument(
         "-r", "--run", action="store_true", help="Profile the python script on launch"
     )
     parser.add_argument(
-        "-o", "--outfile", help="Save stats to OUTFILE (default: 'scriptname.lprof')"
+        "-o", "--outfile", help="Save stats to OUTFILE (default: 'scriptname.lprof')",
     )
     parser.add_argument(
         "-s", "--setup", help="Python script to execute before the code to profile"
@@ -57,6 +60,10 @@ def main():
     # Create main window
     win = UI_MainWindow()
     win.show()
+
+    if options.lprof:
+        win.load_lprof(options.lprof)
+
     win.config.script = options.script
     win.config.args = options.args
     win.config.warmup = options.setup
@@ -67,7 +74,7 @@ def main():
             win.profile()
         else:
             win.configure()
-    else:
+    elif not options.lprof:
         win.configure()
 
     # Run Qt event loop

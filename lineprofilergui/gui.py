@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
@@ -254,10 +255,15 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         # self.dockOutputWidget.setWindowTitle() overrides the action text
         # We reset it without the icon to avoid a ugly menu entry
         self.actionShowOutput.setText(_("&Console output"))
-        profile_data = load_profile_data(self.config.stats)
 
-        text = f"{profile_duration_str}s at {profile_time_str}"
-        self.historyCombo.insertItem(0, text, profile_data)
+        title = f"{profile_duration_str}s at {profile_time_str}"
+        self.load_lprof(self.config.stats, title)
+
+    def load_lprof(self, lprof_file, title=None):
+        profile_data = load_profile_data(lprof_file)
+        if not title:
+            title = os.path.basename(lprof_file)
+        self.historyCombo.insertItem(0, title, profile_data)
         self.historyCombo.setCurrentIndex(0)
 
     @QtCore.Slot(str)

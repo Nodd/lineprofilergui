@@ -10,11 +10,12 @@ It is functionnaly equivalent to the ``kernprof`` script, which is used to invoq
 Features
 ========
 
-* **Command line**: Configure and run from the command line, just like ``kernprof``.
-* **GUI**: Configure and run from the GUI, just like ``kernprof`` but with buttons.
+* **Command line**: Configure and run from the command line, just like ``kernprof``,
+* **GUI**: Configure and run from the GUI, just like ``kernprof`` but with buttons,
+* **Colors**: Highlight lines based on the percentage of time spent on them to easily spot the lines to be optimised,
 * **Configuration**: Setup warmup script, environment variables, and more!
-* **History**: Compare timing with previous profiling runs.
-* **Viewer**: Display data from any .lprof file by ``kernprof``.
+* **History**: Compare timing with previous profiling runs,
+* **Viewer**: Display data from any .lprof file by ``kernprof``,
 * **Editor**: Double-click on any line to edit it with your favorite editor.
 
 
@@ -34,13 +35,13 @@ Don't forget to remove the added decorators afterwards!
 
 Once the profilng is done, the following data will be disaplyed for each line of the decorated functions:
 
-* Line #: The line number in the file.
-* Hits: The number of times that line was executed.
-* Time: The total amount of time spent executing the line.
-* Per Hit: The average amount of time spent executing the line once.
-* % Time: The percentage of time spent on that line relative to the total
+* **Line #**: The line number in the file.
+* **Hits**: The number of times that line was executed.
+* **Time**: The total amount of time spent executing the line.
+* **Per Hit**: The average amount of time spent executing the line once.
+* **% Time**: The percentage of time spent on that line relative to the total
   amount of recorded time spent in the function.
-* Line Contents: The actual source code. Note that this is always read from
+* **Line Contents**: The actual source code. Note that this is always read from
   disk when the formatted results are viewed, *not* when the code was
   executed. If you have edited the file in the meantime, the lines will not
   match up, and the formatter may not even be able to locate the function

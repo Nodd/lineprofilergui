@@ -185,6 +185,8 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         self.itemCollapsed.connect(self.item_collapsed)
         self.itemExpanded.connect(self.item_expanded)
 
+        self.updateColonsVisible()
+
     def show_tree(self, profiledata):
         """Populate the tree with line profiler data and display it."""
         # Remember scrollbar position
@@ -298,7 +300,7 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         settings = QtCore.QSettings()
         for col in range(5):
             self.setColumnHidden(
-                col, not int(settings.value(f"column{col+1}Visible", 1))
+                col, not settings.value(f"column{col+1}Visible", True, bool)
             )
 
     @QtCore.Slot(QtWidgets.QTreeWidgetItem)

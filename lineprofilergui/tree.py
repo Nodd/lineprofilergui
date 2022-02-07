@@ -187,15 +187,21 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
     def show_tree(self, profiledata):
         """Populate the tree with line profiler data and display it."""
-        self.clear()  # Clear before re-populating
+        # Remember scrollbar position
+        scrollbar = self.verticalScrollBar()
+        scroll = scrollbar.value()
+
+        # Fill the widget with the profile data
         self.populate_tree(profiledata)
 
+        # Adjust column width to fit all content
         self.lock_expanded_tracking = True
         self.expandAll()
         self.lock_expanded_tracking = False
         for col in range(self.columnCount() - 1):
             self.resizeColumnToContents(col)
 
+        # Restore expanded state for each function
         if self.topLevelItemCount() > 1:
             self.lock_expanded_tracking = True
             root = self.invisibleRootItem()
@@ -205,8 +211,15 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
                 item.setExpanded(func_id in self.expanded_functions)
             self.lock_expanded_tracking = False
 
+        # Restore scrollbar position
+        scrollbar.setValue(scroll)
+
     def populate_tree(self, profiledata):
         """Create each item (and associated data) in the tree"""
+        # Clear before re-populating
+        self.clear()
+
+        # Display a warning in case of empty profile data
         if not profiledata:
             self.warn_no_data()
             return

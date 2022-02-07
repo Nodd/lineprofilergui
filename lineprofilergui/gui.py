@@ -154,7 +154,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionSettings.triggered.connect(self.settingsDialog.show)
         self.actionRun.triggered.connect(self.profile)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
-        self.actionShowOutput.toggled.connect(self.outputWidget.setVisible)
+        self.actionShowOutput.toggled.connect(self.dockOutputWidget.setVisible)
         self.actionLoadLprof.triggered.connect(self.selectLprof)
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionLine_profiler_documentation.triggered.connect(

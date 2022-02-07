@@ -47,6 +47,10 @@ class FunctionData:
         self.load_code()
         self.parse_stats(stats)
 
+    @property
+    def id(self):
+        return (self.filename, self.name)
+
     def load_code(self):
         # Note : linecache cache was checked at start of profiling
         # This way if the file has changed since the code ran there
@@ -164,6 +168,9 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
         self.profiledata = None
 
+        self.lock_expanded_tracking = False
+        self.expanded_functions = set()
+
     def setup_ui(self):
         self.setColumnCount(len(self.column_header_text))
         self.setHeaderLabels(self.column_header_text)
@@ -175,18 +182,30 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         self.setDragEnabled(False)
 
         self.itemActivated.connect(self.item_activated)
+        self.itemCollapsed.connect(self.item_collapsed)
+        self.itemExpanded.connect(self.item_expanded)
 
     def show_tree(self, profiledata):
         """Populate the tree with line profiler data and display it."""
         self.clear()  # Clear before re-populating
         self.populate_tree(profiledata)
 
+        self.lock_expanded_tracking = True
         self.expandAll()
+        self.lock_expanded_tracking = False
         for col in range(self.columnCount() - 1):
             self.resizeColumnToContents(col)
 
         if self.topLevelItemCount() > 1:
+            self.lock_expanded_tracking = True
             self.collapseAll()
+            root = self.invisibleRootItem()
+            for index in range(root.childCount()):
+                item = root.child(index)
+                func_id = item.data(self.COL_FILE_LINE, Qt.UserRole)
+                if func_id in self.expanded_functions:
+                    item.setExpanded(True)
+            self.lock_expanded_tracking = False
 
     def populate_tree(self, profiledata):
         """Create each item (and associated data) in the tree"""
@@ -209,6 +228,7 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
                     time_ms=func_data.total_time * 1e3,
                 ),
             )
+            func_item.setData(self.COL_0, Qt.UserRole, func_data.id)
             func_item.setFirstColumnSpanned(True)
             if not func_data.was_called:
                 func_item.setForeground(self.COL_0, self.CODE_NOT_RUN_COLOR)
@@ -265,6 +285,7 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
                 col, not int(settings.value(f"column{col+1}Visible", 1))
             )
 
+    @QtCore.Slot(QtWidgets.QTreeWidgetItem)
     def item_activated(self, item):
         # Skip parent lines
         if item.isFirstColumnSpanned():
@@ -292,3 +313,19 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
             subprocess.Popen(editor_command, shell=False)
         except FileNotFoundError:
             subprocess.Popen(editor_command, shell=True)
+
+    @QtCore.Slot(QtWidgets.QTreeWidgetItem)
+    def item_collapsed(self, item):
+        # Skip child lines
+        if self.lock_expanded_tracking or not item.isFirstColumnSpanned():
+            return
+        func_id = item.data(self.COL_FILE_LINE, Qt.UserRole)
+        self.expanded_functions.discard(func_id)
+
+    @QtCore.Slot(QtWidgets.QTreeWidgetItem)
+    def item_expanded(self, item):
+        # Skip child lines
+        if self.lock_expanded_tracking or not item.isFirstColumnSpanned():
+            return
+        func_id = item.data(self.COL_FILE_LINE, Qt.UserRole)
+        self.expanded_functions.add(func_id)

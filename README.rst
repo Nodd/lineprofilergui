@@ -1,7 +1,7 @@
-line-profiler-gui
+Line Profiler GUI
 -----------------
 
-This is a Qt GUI for the `line-profiler <https://pypi.org/project/line_profiler/>`_ python utility.
+This is a Qt GUI for the line_profiler_ python utility.
 
 It allows to run and display the profiling results using an interactive interface.
 It is functionnaly equivalent to the ``kernprof`` script, which is used to invoque ``line_profiler`` from the command line.
@@ -9,6 +9,8 @@ It is functionnaly equivalent to the ``kernprof`` script, which is used to invoq
 .. image:: https://raw.githubusercontent.com/Nodd/lineprofilergui/master/images/screenshot_main.png
   :alt: Screenshot of Line Profier GUI main window
   :align: center
+
+.. contents::
 
 
 Features
@@ -31,12 +33,31 @@ Features
   :align: center
 
 
+Installation
+============
+
+Line Profiler GUI can be installed from pypi using pip::
+
+  $ pip install line-profiler-gui
+
+You can install the Qt python bindings of your choice by specifying it between square brackets::
+
+  $ pip install line-profiler-gui[PySide2]
+  $ pip install line-profiler-gui[PyQt5]
+
+Source releases can be downloaded from PyPI_. To check out the development sources, you can use Git_::
+
+  $ git clone https://github.com/Nodd/lineprofilergui.git
+
+
 Usage
 =====
 
 Users should be familiar with the operation of line-profiler, detailed in its `documentation <https://github.com/pyutils/line_profiler#id2>`_, but here is a quick reminder.
 Since the line by line profiling slown down the execution, not all functions are profiled.
-The functions to be profiled have to be marked with a ``@profile`` decorator, as such::
+The functions to be profiled have to be marked with a ``@profile`` decorator, as such:
+
+.. code-block:: python
 
     @profile
     def my_slow_function():
@@ -95,3 +116,8 @@ Requirements
 
 ``lineprofilergui`` uses the `QtPy <https://pypi.org/project/QtPy/>`_ abstraction layer for Qt.
 You need at least one of PyQt5, PyQt6, PySide2 or PySide6 installed in your system to make use of QtPy.
+
+
+.. _pypi: http://pypi.python.org/pypi/line-profiler-gui
+.. _line_profiler: https://pypi.org/project/line_profiler/
+.. _git: http://git-scm.com/

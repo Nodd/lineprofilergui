@@ -165,7 +165,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionConfigure.setText(_("&Configuration..."))
         self.actionConfigure.setShortcut(_("Ctrl+O"))
         self.actionLine_profiler_documentation.setText(
-            _("&Line profiler documentation...")
+            _("&Line-profiler documentation...")
         )
         self.actionLine_profiler_documentation.setShortcut(_("F1"))
         self.actionAbout_Qt.setText(_("&About Qt..."))

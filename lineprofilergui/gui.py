@@ -64,6 +64,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionAbort.setIcon(ICONS["STOP"])
         self.actionShowOutput = self.dockOutputWidget.toggleViewAction()
         self.actionShowOutput.setIcon(ICONS["INFO"])
+        self.actionLoadLprof = QtWidgets.QAction(self)
+        self.actionLoadLprof.setIcon(ICONS["READFILE"])
         self.actionQuit = QtWidgets.QAction(self)
         self.actionQuit.setIcon(ICONS["ABORT"])
         self.actionConfigure = QtWidgets.QAction(self)
@@ -86,6 +88,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.menuProfiling.addAction(self.actionRun)
         self.menuProfiling.addAction(self.actionAbort)
         self.menuProfiling.addAction(self.actionShowOutput)
+        self.menuProfiling.addSeparator()
+        self.menuProfiling.addAction(self.actionLoadLprof)
         self.menuProfiling.addSeparator()
         self.menuProfiling.addAction(self.actionQuit)
         self.menubar.addAction(self.menuProfiling.menuAction())
@@ -151,6 +155,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionRun.triggered.connect(self.profile)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
         self.actionShowOutput.toggled.connect(self.outputWidget.setVisible)
+        self.actionLoadLprof.triggered.connect(self.selectLprof)
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionLine_profiler_documentation.triggered.connect(
             lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl(LINE_PROFILER_DOC_URL))
@@ -193,6 +198,17 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         if self.config.script:
             title += f" - {self.config.script}"
         self.setWindowTitle(title)
+
+    @QtCore.Slot()
+    def selectLprof(self):
+        filename, _selfilter = qtcompat.getopenfilename(
+            self,
+            _("Select line profiler data"),
+            "",
+            _("Line profiler data") + " (*.lprof);; " + _("All files") + " (*.*)",
+        )
+        if filename:
+            self.load_lprof(filename)
 
     @QtCore.Slot()
     def configure(self):
@@ -258,13 +274,17 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         # We reset it without the icon to avoid a ugly menu entry
         self.actionShowOutput.setText(_("&Console output"))
 
-        title = f"{profile_duration_str}s at {profile_time_str}"
+        title = _("{duration}s at {time}").format(
+            duration=profile_duration_str, time=profile_time_str
+        )
         self.load_lprof(self.config.stats, title)
 
     def load_lprof(self, lprof_file, title=None):
         profile_data = load_profile_data(lprof_file)
         if not title:
-            title = os.path.basename(lprof_file)
+            time = datetime.datetime.now().strftime("%X")
+            name = os.path.basename(lprof_file)
+            title = _("{name} at {time}").format(name=name, time=time)
         self.historyCombo.insertItem(0, title, profile_data)
         self.historyCombo.setCurrentIndex(0)
 

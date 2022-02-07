@@ -204,8 +204,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     def read_settings(self):
         settings = QtCore.QSettings()
         settings.beginGroup("MainWindow")
-        self.restoreGeometry(settings.value("geometry", type=QtCore.QByteArray))
-        self.restoreState(settings.value("state", type=QtCore.QByteArray))
+        self.restoreGeometry(settings.value("geometry"))
+        self.restoreState(settings.value("state"))
         settings.endGroup()
 
     @QtCore.Slot()

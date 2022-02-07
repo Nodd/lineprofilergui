@@ -26,6 +26,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.profile_start_time = None
 
     def setup_ui(self):
+        settings = QtCore.QSettings()
         # Main window
         # app.setWindowIcon(QIcon(_WINDOW_ICON))
         self.resize(800, 600)
@@ -51,7 +52,12 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.outputWidget.setMinimumSize(300, 50)
         self.dockOutputWidget = QtWidgets.QDockWidget(self)
         self.dockOutputWidget.setWidget(self.outputWidget)
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.dockOutputWidget)
+        dockWidgetArea = settings.value(
+            "dockOutputWidget/DockWidgetArea",
+            Qt.BottomDockWidgetArea,
+            Qt.DockWidgetArea,
+        )
+        self.addDockWidget(dockWidgetArea, self.dockOutputWidget)
 
         # Actions
         self.actionCollapse_all = QtWidgets.QAction(self)
@@ -155,6 +161,11 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionRun.triggered.connect(self.profile)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
         self.actionShowOutput.toggled.connect(self.dockOutputWidget.setVisible)
+        self.dockOutputWidget.dockLocationChanged.connect(
+            lambda area: QtCore.QSettings().setValue(
+                "dockOutputWidget/DockWidgetArea", area
+            )
+        )
         self.actionLoadLprof.triggered.connect(self.selectLprof)
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionLine_profiler_documentation.triggered.connect(

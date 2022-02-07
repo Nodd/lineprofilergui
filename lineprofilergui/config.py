@@ -182,6 +182,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.wdirWidget.setObjectName("wdirWidget")
         self.wdirLayout.addWidget(self.wdirWidget)
         self.wdirStatusLabel = QtWidgets.QLabel(self)
+        self.wdirStatusLabel.setPixmap(PIXMAPS["NOK"])
         self.wdirLayout.addWidget(self.wdirStatusLabel)
         self.wdirButton = QtWidgets.QPushButton(self)
         self.wdirButton.setIcon(ICONS["DIRECTORY"])
@@ -203,6 +204,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.scriptWidget.setObjectName("scriptWidget")
         self.scriptLayout.addWidget(self.scriptWidget)
         self.scriptStatusLabel = QtWidgets.QLabel(self)
+        self.scriptStatusLabel.setPixmap(PIXMAPS["NOK"])
         self.scriptLayout.addWidget(self.scriptStatusLabel)
         self.scriptButton = QtWidgets.QPushButton(self)
         self.scriptButton.setIcon(ICONS["READFILE"])
@@ -233,6 +235,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.warmupWidget.setObjectName("warmupWidget")
         self.warmupLayout.addWidget(self.warmupWidget)
         self.warmupStatusLabel = QtWidgets.QLabel(self)
+        self.warmupStatusLabel.setPixmap(PIXMAPS["NOK"])
         self.warmupLayout.addWidget(self.warmupStatusLabel)
         self.warmupButton = QtWidgets.QPushButton(self)
         self.warmupButton.setIcon(ICONS["READFILE"])
@@ -252,6 +255,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.envWidget.setObjectName("envWidget")
         self.envLayout.addWidget(self.envWidget)
         self.envStatusLabel = QtWidgets.QLabel(self)
+        self.envStatusLabel.setPixmap(PIXMAPS["NOK"])
         self.envLayout.addWidget(self.envStatusLabel)
         self.configLayout.setLayout(
             row, QtWidgets.QFormLayout.FieldRole, self.envLayout
@@ -269,6 +273,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.statsWidget.setObjectName("statsWidget")
         self.statsLayout.addWidget(self.statsWidget)
         self.statsStatusLabel = QtWidgets.QLabel(self)
+        self.statsStatusLabel.setPixmap(PIXMAPS["NOK"])
         self.statsLayout.addWidget(self.statsStatusLabel)
         self.statsButton = QtWidgets.QPushButton(self)
         self.statsButton.setIcon(ICONS["BLANKFILE"])
@@ -290,6 +295,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.kernprofWidget.setObjectName("kernprofWidget")
         self.kernprofLayout.addWidget(self.kernprofWidget)
         self.kernprofStatusLabel = QtWidgets.QLabel(self)
+        self.kernprofStatusLabel.setPixmap(PIXMAPS["NOK"])
         self.kernprofLayout.addWidget(self.kernprofStatusLabel)
         self.kernprofButton = QtWidgets.QPushButton(self)
         self.kernprofButton.setIcon(ICONS["READFILE"])
@@ -363,7 +369,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
             self.wdirWidget.setText(filename)
 
     def display_status(self, widget, indicator):
-        indicator.setPixmap(PIXMAPS["OK" if widget.hasAcceptableInput() else "NOK"])
+        indicator.setVisible(not widget.hasAcceptableInput())
         self.update_profileButton_enabled()
 
     @QtCore.Slot(str)

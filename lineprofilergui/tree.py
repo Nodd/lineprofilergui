@@ -92,6 +92,8 @@ class FunctionData:
 
 
 class LineData:
+    __slots__ = "_func_data line_no code total_time hits filename".split()
+
     def __init__(self, func_data, line_no, code, total_time, hits):
         self._func_data = func_data
         self.line_no = line_no
@@ -99,8 +101,6 @@ class LineData:
         self.total_time = total_time
         self.hits = hits
         self.filename = func_data.filename
-
-        self.func_total_time = None
 
     @property
     def percent_str(self):

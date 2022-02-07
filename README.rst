@@ -40,7 +40,8 @@ Line Profiler GUI can be installed from pypi using pip::
 
   $ pip install line-profiler-gui
 
-You can install the Qt python bindings of your choice by specifying it between square brackets::
+Line Profiler GUI can use anyon of the Qt python bindings by using QtPy_: PyQt5, PyQt6, PySide2 or PySide6.
+You can install the Qt python bindings of your choice in one go by specifying it between square brackets::
 
   $ pip install line-profiler-gui[PySide2]
   $ pip install line-profiler-gui[PyQt5]
@@ -53,9 +54,9 @@ Source releases can be downloaded from PyPI_. To check out the development sourc
 Usage
 =====
 
-Users should be familiar with the operation of line-profiler, detailed in its `documentation <https://github.com/pyutils/line_profiler#id2>`_, but here is a quick reminder.
+Users should be familiar with the line_profiler `line_profiler documentation <https://github.com/pyutils/line_profiler#id2>`_, but here is a quick reminder.
 Since the line by line profiling slown down the execution, not all functions are profiled.
-The functions to be profiled have to be marked with a ``@profile`` decorator, as such:
+The functions to be profiled have to be marked with a ``@profile`` decorator (see the ``example/`` directory for more examples):
 
 .. code-block:: python
 
@@ -87,7 +88,7 @@ This allows to easily spot the lines to be optimised, and to not be distracted b
 Command line arguments
 ======================
 
-.. code::
+.. code:: console
 
     $ lineprofilergui -h
     usage: lineprofilergui [-h] [-V] [-l LPROF] [-r] [-o OUTFILE] [-s SETUP]
@@ -114,10 +115,9 @@ Command line arguments
 Requirements
 ============
 
-``lineprofilergui`` uses the `QtPy <https://pypi.org/project/QtPy/>`_ abstraction layer for Qt.
-You need at least one of PyQt5, PyQt6, PySide2 or PySide6 installed in your system to make use of QtPy.
 
 
 .. _pypi: http://pypi.python.org/pypi/line-profiler-gui
 .. _line_profiler: https://pypi.org/project/line_profiler/
+.. _QtPy: https://pypi.org/project/QtPy/
 .. _git: http://git-scm.com/

@@ -261,6 +261,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         profile_duration = profile_stop_time - self.profile_start_time
         profile_time_str = profile_stop_time.strftime("%X")
         profile_duration_str = str(profile_duration).lstrip("0:")
+        if profile_duration_str.startswith("."):
+            profile_duration_str = "0" + profile_duration_str
         self.statusbar_time.setText(
             _("Last profiling ended at {time} and ran for {duration}s").format(
                 time=profile_time_str, duration=profile_duration_str,

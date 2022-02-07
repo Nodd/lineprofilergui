@@ -5,7 +5,7 @@ from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
 
 from .config import Config, Ui_ConfigDialog
-from .tree import ResultsTreeWidget
+from .tree import ResultsTreeWidget, load_profile_data
 from .settings import UI_SettingsDialog
 from .utils import translate as _, MONOSPACE_FONT, _icons_factory, ICONS, PIXMAPS
 from .process import KernprofRun
@@ -115,6 +115,10 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionCollapse_all)
         self.toolBar.addAction(self.actionExpand_all)
+        self.toolBar.addSeparator()
+        self.historyCombo = QtWidgets.QComboBox(self)
+        self.historyCombo.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
+        self.toolBar.addWidget(self.historyCombo)
 
         # Statusbar
         self.statusbar = QtWidgets.QStatusBar(self)
@@ -154,6 +158,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.kernprof_run.output_text.connect(self.append_log_text)
         self.kernprof_run.output_error.connect(self.append_log_error)
         self.settingsDialog.accepted.connect(self.resultsTreeWidget.updateColonsVisible)
+        self.historyCombo.currentIndexChanged.connect(self.load_history)
 
     def retranslate_ui(self):
         self.update_window_title()
@@ -230,10 +235,11 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     def process_finished(self, exit_code, exit_status):
         profile_stop_time = datetime.datetime.now()
         profile_duration = profile_stop_time - self.profile_start_time
+        profile_time_str = profile_stop_time.strftime("%X")
+        profile_duration_str = str(profile_duration).lstrip("0:")
         self.statusbar_time.setText(
-            _("Last profiling ended at {time} and ran for {duration}").format(
-                time=profile_stop_time.isoformat(sep=" ", timespec="seconds"),
-                duration=str(profile_duration),
+            _("Last profiling ended at {time} and ran for {duration}s").format(
+                time=profile_time_str, duration=profile_duration_str,
             )
         )
         if exit_code or exit_status:
@@ -248,7 +254,11 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         # self.dockOutputWidget.setWindowTitle() overrides the action text
         # We reset it without the icon to avoid a ugly menu entry
         self.actionShowOutput.setText(_("&Console output"))
-        self.resultsTreeWidget.load_data(self.config.stats)
+        profile_data = load_profile_data(self.config.stats)
+
+        text = f"{profile_duration_str}s at {profile_time_str}"
+        self.historyCombo.insertItem(0, text, profile_data)
+        self.historyCombo.setCurrentIndex(0)
 
     @QtCore.Slot(str)
     def append_log_text(self, text):
@@ -257,3 +267,9 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot(str)
     def append_log_error(self, text):
         self.outputWidget.appendHtml(f'<p style="color:red;white-space:pre">{text}</p>')
+
+    @QtCore.Slot(int)
+    def load_history(self, index):
+        if index < 0:
+            return
+        self.resultsTreeWidget.show_tree(self.historyCombo.currentData())

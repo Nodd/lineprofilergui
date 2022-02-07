@@ -176,14 +176,10 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
         self.itemActivated.connect(self.item_activated)
 
-    def load_data(self, filename):
-        self.profiledata = load_profile_data(filename)
-        self.show_tree()
-
-    def show_tree(self):
+    def show_tree(self, profiledata):
         """Populate the tree with line profiler data and display it."""
         self.clear()  # Clear before re-populating
-        self.populate_tree()
+        self.populate_tree(profiledata)
 
         self.expandAll()
         for col in range(self.columnCount() - 1):
@@ -192,13 +188,13 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         if self.topLevelItemCount() > 1:
             self.collapseAll()
 
-    def populate_tree(self):
+    def populate_tree(self, profiledata):
         """Create each item (and associated data) in the tree"""
-        if not self.profiledata:
+        if not profiledata:
             self.warn_no_data()
             return
 
-        for func_data in self.profiledata:
+        for func_data in profiledata:
             # Function name and position
             func_item = QtWidgets.QTreeWidgetItem(self)
             func_item.setData(

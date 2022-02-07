@@ -8,7 +8,7 @@ import qtpy.compat as qtcompat
 from .config import Config, Ui_ConfigDialog
 from .tree import ResultsTreeWidget, load_profile_data
 from .settings import UI_SettingsDialog
-from .utils import translate as _, MONOSPACE_FONT, _icons_factory, ICONS, PIXMAPS
+from .utils import translate as _, MONOSPACE_FONT, ICONS, PIXMAPS
 from .process import KernprofRun
 
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"

@@ -1,4 +1,4 @@
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from .utils import translate as _
 

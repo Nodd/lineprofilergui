@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from .gui import UI_MainWindow
 from .utils import _icons_factory

@@ -247,27 +247,3 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot(str)
     def append_log_error(self, text):
         self.outputWidget.appendHtml(f'<p style="color:red;white-space:pre">{text}</p>')
-
-
-def create_app(options):
-    # Create Qt application
-    app = QtWidgets.QApplication([])
-    _icons_factory()
-
-    # Create main window
-    win = UI_MainWindow()
-    win.show()
-    if options.script:
-        win.config.build_simple_config(options.script, options.args, options.outfile)
-        win.update_window_title()
-        if options.run:
-            win.profile()
-        else:
-            win.configure()
-    else:
-        win.configure()
-
-    # Keep a reference to the win object to avoid destruction
-    app.win = win
-
-    return app

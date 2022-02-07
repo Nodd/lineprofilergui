@@ -1,7 +1,10 @@
 import sys
 import argparse
 
-from .gui import create_app
+from qtpy import QtWidgets
+
+from .gui import UI_MainWindow
+from .utils import _icons_factory
 from . import __version__
 
 
@@ -45,7 +48,25 @@ def commandline_args():
 
 def main():
     options = commandline_args()
-    app = create_app(options)
+
+    # Create Qt application
+    app = QtWidgets.QApplication([])
+    _icons_factory()
+
+    # Create main window
+    win = UI_MainWindow()
+    win.show()
+    if options.script:
+        win.config.build_simple_config(options.script, options.args, options.outfile)
+        win.update_window_title()
+        if options.run:
+            win.profile()
+        else:
+            win.configure()
+    else:
+        win.configure()
+
+    # Run Qt event loop
     sys.exit(app.exec_())
 
 

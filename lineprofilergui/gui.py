@@ -38,26 +38,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.resultsTreeWidget)
 
         # Output widget
-        self.outputWidget = QtWidgets.QPlainTextEdit()
-        self.outputWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.outputWidget.setReadOnly(True)
-        self.outputWidget.setTextInteractionFlags(
-            QtCore.Qt.LinksAccessibleByKeyboard
-            | QtCore.Qt.LinksAccessibleByMouse
-            | QtCore.Qt.TextBrowserInteraction
-            | QtCore.Qt.TextSelectableByKeyboard
-            | QtCore.Qt.TextSelectableByMouse
-        )
-        self.outputWidget.setFont(MONOSPACE_FONT)
-        self.outputWidget.setMinimumSize(300, 50)
-        self.dockOutputWidget = QtWidgets.QDockWidget(self)
-        self.dockOutputWidget.setWidget(self.outputWidget)
-        dockWidgetArea = settings.value(
-            "dockOutputWidget/DockWidgetArea",
-            Qt.BottomDockWidgetArea,
-            Qt.DockWidgetArea,
-        )
-        self.addDockWidget(dockWidgetArea, self.dockOutputWidget)
+        self.dockOutputWidget = DockOutputWidget(self)
+        self.addDockWidget(self.dockOutputWidget.area, self.dockOutputWidget)
 
         # Actions
         self.actionCollapse_all = QtWidgets.QAction(self)
@@ -161,19 +143,14 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionRun.triggered.connect(self.profile)
         self.actionAbort.triggered.connect(self.kernprof_run.kill)
         self.actionShowOutput.toggled.connect(self.dockOutputWidget.setVisible)
-        self.dockOutputWidget.dockLocationChanged.connect(
-            lambda area: QtCore.QSettings().setValue(
-                "dockOutputWidget/DockWidgetArea", area
-            )
-        )
         self.actionLoadLprof.triggered.connect(self.selectLprof)
         self.actionQuit.triggered.connect(QtWidgets.QApplication.instance().quit)
         self.actionLine_profiler_documentation.triggered.connect(
             lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl(LINE_PROFILER_DOC_URL))
         )
         self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
-        self.kernprof_run.output_text.connect(self.append_log_text)
-        self.kernprof_run.output_error.connect(self.append_log_error)
+        self.kernprof_run.output_text.connect(self.dockOutputWidget.append_log_text)
+        self.kernprof_run.output_error.connect(self.dockOutputWidget.append_log_error)
         self.settingsDialog.accepted.connect(self.resultsTreeWidget.updateColonsVisible)
         self.historyCombo.currentIndexChanged.connect(self.load_history)
 
@@ -235,7 +212,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
                 return
 
         # Start process
-        self.outputWidget.clear()
+        self.dockOutputWidget.clear()
         process = self.kernprof_run.prepare()
         process.stateChanged.connect(self.set_running_state)
         process.finished.connect(self.process_finished)
@@ -248,14 +225,10 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionAbort.setEnabled(running)
         self.actionConfigure.setEnabled(not running)
         self.statusbar_running_indicator.setVisible(running)
+        self.dockOutputWidget.set_running_state(running)
         if running:
             self.setCursor(Qt.WaitCursor)
             self.statusbar_running_indicator_timer.start(800)
-            self.actionShowOutput.setIcon(ICONS["RUNNING"])
-            self.dockOutputWidget.setWindowTitle(_("{} Console output").format("🔄"))
-            # self.dockOutputWidget.setWindowTitle() overrides the action text
-            # We reset it without the icon to avoid a ugly menu entry
-            self.actionShowOutput.setText(_("&Console output"))
         else:
             self.unsetCursor()
             self.statusbar_running_indicator_timer.stop()
@@ -272,18 +245,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
                 time=profile_time_str, duration=profile_duration_str,
             )
         )
-        if exit_code or exit_status:
-            self.dockOutputWidget.show()
-            self.dockOutputWidget.activateWindow()
-            self.outputWidget.setFocus(Qt.OtherFocusReason)
-            self.actionShowOutput.setIcon(ICONS["WARNING"])
-            self.dockOutputWidget.setWindowTitle(_("{} Console output").format("⚠"))
-        else:
-            self.actionShowOutput.setIcon(ICONS["INFO"])
-            self.dockOutputWidget.setWindowTitle(_("{} Console output").format("ⓘ"))
-        # self.dockOutputWidget.setWindowTitle() overrides the action text
-        # We reset it without the icon to avoid a ugly menu entry
-        self.actionShowOutput.setText(_("&Console output"))
+        self.dockOutputWidget.set_exit_state(exit_code or exit_status)
 
         title = _("{duration}s at {time}").format(
             duration=profile_duration_str, time=profile_time_str
@@ -299,6 +261,112 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.historyCombo.insertItem(0, title, profile_data)
         self.historyCombo.setCurrentIndex(0)
 
+    @QtCore.Slot(int)
+    def load_history(self, index):
+        if index < 0:
+            return
+        self.resultsTreeWidget.show_tree(self.historyCombo.currentData())
+
+
+class DockOutputWidget(QtWidgets.QDockWidget):
+    def __init__(self, parent):
+        QtWidgets.QDockWidget.__init__(self, parent)
+        self.initialized = False
+        self.setup_ui()
+        self.load_settings()
+        self.initialized = True
+        self.connect()
+
+    def setup_ui(self):
+        # Console ouput widget
+        self.outputWidget = QtWidgets.QPlainTextEdit()
+        self.outputWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.outputWidget.setReadOnly(True)
+        self.outputWidget.setTextInteractionFlags(
+            QtCore.Qt.LinksAccessibleByKeyboard
+            | QtCore.Qt.LinksAccessibleByMouse
+            | QtCore.Qt.TextBrowserInteraction
+            | QtCore.Qt.TextSelectableByKeyboard
+            | QtCore.Qt.TextSelectableByMouse
+        )
+        self.outputWidget.setFont(MONOSPACE_FONT)
+        self.outputWidget.setMinimumSize(300, 50)
+        self.setWidget(self.outputWidget)
+
+    def load_settings(self):
+        settings = QtCore.QSettings()
+
+        # Floating status
+        floating = settings.value("dockOutputWidget/floating", False, bool)
+        self.setFloating(floating)
+
+        # Size
+        key = "floating" if floating else "docked"
+        size = settings.value("dockOutputWidget/size/" + key, None, QtCore.QSize)
+        if size is not None:
+            self.resize(size)
+
+        # Visible
+        self.setVisible(settings.value("dockOutputWidget/visible", True, bool))
+
+    @property
+    def area(self):
+        return QtCore.QSettings().value(
+            "dockOutputWidget/area", Qt.BottomDockWidgetArea, Qt.DockWidgetArea
+        )
+
+    def connect(self):
+        self.dockLocationChanged.connect(
+            lambda area: QtCore.QSettings().setValue("dockOutputWidget/area", area)
+        )
+        self.topLevelChanged.connect(
+            lambda floating: QtCore.QSettings().setValue(
+                "dockOutputWidget/floating", floating
+            )
+        )
+
+    def resizeEvent(self, event):
+        QtWidgets.QDockWidget.resizeEvent(self, event)
+        if self.initialized:
+            key = "floating" if self.isFloating() else "docked"
+            QtCore.QSettings().setValue("dockOutputWidget/size/" + key, event.size())
+
+    def showEvent(self, event):
+        QtWidgets.QDockWidget.showEvent(self, event)
+        if self.initialized:
+            QtCore.QSettings().setValue("dockOutputWidget/visible", True)
+
+    def hideEvent(self, event):
+        QtWidgets.QDockWidget.hideEvent(self, event)
+        if self.initialized:
+            QtCore.QSettings().setValue("dockOutputWidget/visible", False)
+
+    def set_running_state(self, running):
+        actionShowOutput = self.toggleViewAction()
+        actionShowOutput.setIcon(ICONS["RUNNING" if running else "INFO"])
+        if running:
+            self.setWindowTitle(_("{} Console output").format("🔄"))
+            # self.setWindowTitle() overrides the action text
+            # We reset it without the icon to avoid a ugly menu entry
+            actionShowOutput.setText(_("&Console output"))
+        else:
+            self.setWindowTitle(_("Console output"))
+
+    def set_exit_state(self, error):
+        actionShowOutput = self.toggleViewAction()
+        if error:
+            self.show()
+            self.activateWindow()
+            self.outputWidget.setFocus(Qt.OtherFocusReason)
+            actionShowOutput.setIcon(ICONS["WARNING"])
+            self.setWindowTitle(_("{} Console output").format("⚠"))
+        else:
+            actionShowOutput.setIcon(ICONS["INFO"])
+            self.setWindowTitle(_("{} Console output").format("ⓘ"))
+        # self.setWindowTitle() overrides the action text
+        # We reset it without the icon to avoid a ugly menu entry
+        actionShowOutput.setText(_("&Console output"))
+
     @QtCore.Slot(str)
     def append_log_text(self, text):
         self.outputWidget.appendPlainText(text)
@@ -307,8 +375,5 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     def append_log_error(self, text):
         self.outputWidget.appendHtml(f'<p style="color:red;white-space:pre">{text}</p>')
 
-    @QtCore.Slot(int)
-    def load_history(self, index):
-        if index < 0:
-            return
-        self.resultsTreeWidget.show_tree(self.historyCombo.currentData())
+    def clear(self):
+        self.outputWidget.clear()

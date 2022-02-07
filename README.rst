@@ -112,9 +112,11 @@ Command line arguments
                             Python script to execute before the code to profile
 
 
-Requirements
-============
+See also
+========
 
+* `Spyder plugin <https://github.com/spyder-ide/spyder-line-profiler>`_
+* `PyCharm plugin <https://plugins.jetbrains.com/plugin/16536-line-profiler>`_
 
 
 .. _pypi: http://pypi.python.org/pypi/line-profiler-gui

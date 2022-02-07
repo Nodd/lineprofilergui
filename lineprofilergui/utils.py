@@ -10,7 +10,7 @@ MONOSPACE_FONT.setStyleHint(QtGui.QFont.Monospace)
 MONOSPACE_FONT.setPointSize(9)
 
 _ICON_IDS = {
-    "OK": QtWidgets.QStyle.SP_DialogApplyButton,  # Icon valid field
+    "OK": QtWidgets.QStyle.SP_DialogApplyButton,
     "NOK": QtWidgets.QStyle.SP_DialogCancelButton,  # Icon invalid field
     "START": QtWidgets.QStyle.SP_MediaPlay,  # actionRun
     "STOP": QtWidgets.QStyle.SP_MediaStop,  # actionAbort

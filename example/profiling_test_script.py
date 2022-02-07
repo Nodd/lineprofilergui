@@ -46,7 +46,10 @@ def sum_(
     this_is_the_last_one_i_promise,
     ___i_m_sorry,
 ):
+    """Docstring"""
+    # Comment
     result = 0
+    "string"
 
     for i in range(1, n + 1):
         result += i

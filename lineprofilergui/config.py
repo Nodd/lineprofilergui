@@ -330,7 +330,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslate_ui(self):
-        self.setWindowTitle(_("Line profiler configuration"))
+        self.setWindowTitle(_("Line Profiler GUI - Profiling configuration"))
         self.wdirLabel.setText(_("Working directory"))
         self.wdirButton.setText(_("Select..."))
         self.scriptLabel.setText(_("Python script"))

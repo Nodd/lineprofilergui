@@ -163,7 +163,7 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
     CODE_NOT_RUN_COLOR = QtGui.QBrush(QtGui.QColor.fromRgb(128, 128, 128, 200))
 
     def __init__(self, parent):
-        QtWidgets.QTreeWidget.__init__(self, parent)
+        super().__init__(parent)
         self.setup_ui()
 
         self.profiledata = None

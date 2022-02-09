@@ -18,7 +18,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         self.config = Config()
 
-        QtWidgets.QMainWindow.__init__(self)
+        super().__init__()
         self.setup_ui()
         self.kernprof_run = KernprofRun(self.config)
         self.connect()
@@ -293,7 +293,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
 class DockOutputWidget(QtWidgets.QDockWidget):
     def __init__(self, parent):
-        QtWidgets.QDockWidget.__init__(self, parent)
+        super().__init__(parent)
         self.setup_ui()
 
     def setup_ui(self):

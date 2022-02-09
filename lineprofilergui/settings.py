@@ -12,7 +12,7 @@ EDITOR_COMMAND_EXAMPLES = [
 
 class UI_SettingsDialog(QtWidgets.QDialog):
     def __init__(self, parent):
-        QtWidgets.QDialog.__init__(self, parent)
+        super().__init__(parent)
         self.setup_ui()
 
     def setup_ui(self):

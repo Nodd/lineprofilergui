@@ -119,7 +119,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     def __init__(self, parent, config):
         self.config = config
 
-        QtWidgets.QDialog.__init__(self, parent)
+        super().__init__(parent)
         self.setup_ui()
 
         self.config_to_ui()
@@ -444,7 +444,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
 class ConfigValidator(QtGui.QValidator):
     def __init__(self, configDialog, widgetID):
-        QtGui.QValidator.__init__(self)
+        super().__init__()
         self.configDialog = configDialog
         self.widgetID = widgetID
 

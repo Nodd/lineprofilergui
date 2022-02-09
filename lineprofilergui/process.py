@@ -14,7 +14,7 @@ class KernprofRun(QtCore.QObject):
     output_error = QtCore.Signal(str)
 
     def __init__(self, config):
-        QtCore.QObject.__init__(self)
+        super().__init__()
         self.config = config
 
         self.process = None

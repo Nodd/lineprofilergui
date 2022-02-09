@@ -26,7 +26,6 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.profile_start_time = None
 
     def setup_ui(self):
-        settings = QtCore.QSettings()
         # Main window
         # app.setWindowIcon(QIcon(_WINDOW_ICON))
         self.resize(800, 600)

@@ -24,7 +24,14 @@ def run_code(code, tmp_path, qtbot):
 
 
 class TestMainWindow:
+    """Global checks for the main window and profiling results
+
+    Those are more functional tests rather than unit tests,
+    but at least is assures that there is no basic problem in most of the code.
+    """
+
     def test_profile_1_function(self, qtbot, tmp_path):
+        """Check that the result tree is filled correctly"""
         code = """
         @profile
         def profiled_function():
@@ -77,6 +84,7 @@ class TestMainWindow:
         assert func_item.child(1).data(0, Qt.UserRole) == (scriptfile, 4)
 
     def test_profile_2_functions(self, qtbot, tmp_path):
+        """Check the profiling of 2 different functions"""
         code = """
         @profile
         def profiled_function1():
@@ -102,6 +110,7 @@ class TestMainWindow:
         assert tree.topLevelItemCount() == 2  # functions profiled
 
     def test_function_not_called(self, qtbot, tmp_path):
+        """Check the case of a decoracted function not called"""
         code = """
         @profile
         def not_profiled_function():
@@ -120,6 +129,7 @@ class TestMainWindow:
         assert tree.topLevelItemCount() == 1  # function decorated but not profiled
 
     def test_warn_no_decorator(self, qtbot, tmp_path):
+        """Check the case of no @profile decorator in script"""
         code = """
         def not_profiled_function():
             return "This was not profiled"
@@ -147,6 +157,7 @@ class TestMainWindow:
         assert warn_item.data(0, Qt.UserRole) is None
 
     def test_collapse_expand(self, qtbot, tmp_path):
+        """Check the tracking of expanded functions"""
         code = """
         @profile
         def profiled_function():

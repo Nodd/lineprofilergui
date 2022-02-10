@@ -1,46 +1,14 @@
+import textwrap
+
 from qtpy.QtCore import Qt
 
 from lineprofilergui import main
-
-SCRIPT_PROFILE_1_FUNCTION = """
-@profile
-def profiled_function():
-    return "This was profiled"
-
-profiled_function()
-"""
-
-SCRIPT_PROFILE_2_FUNCTIONS = """
-@profile
-def profiled_function1():
-    return "This was profiled"
-
-@profile
-def profiled_function2():
-    return "This was profiled too"
-
-profiled_function1()
-profiled_function2()
-"""
-
-SCRIPT_FUNCTION_NOT_CALLED = """
-@profile
-def not_profiled_function():
-    return "This was not profiled"
-"""
-
-SCRIPT_NO_DECORATOR = """
-def not_profiled_function():
-    return "This was not profiled"
-
-not_profiled_function()
-"""
 
 
 def run_code(code, tmp_path, qtbot):
     """Helper function to run profiled code from UI_MainWindow"""
     scriptfile = tmp_path / "script.py"
-    scriptfile.write_text(code)
+    scriptfile.write_text(textwrap.dedent(code))
 
     with tmp_path:
         main.icons_factory()
@@ -57,7 +25,14 @@ def run_code(code, tmp_path, qtbot):
 
 class TestMainWindow:
     def test_profile_1_function(self, qtbot, tmp_path):
-        win = run_code(SCRIPT_PROFILE_1_FUNCTION, tmp_path, qtbot)
+        code = """
+        @profile
+        def profiled_function():
+            return "This was profiled"
+
+        profiled_function()
+        """
+        win = run_code(code, tmp_path, qtbot)
         scriptfile = str(tmp_path / "script.py")
 
         lprof_path = tmp_path / "script.lprof"
@@ -102,7 +77,19 @@ class TestMainWindow:
         assert func_item.child(1).data(0, Qt.UserRole) == (scriptfile, 4)
 
     def test_profile_2_functions(self, qtbot, tmp_path):
-        win = run_code(SCRIPT_PROFILE_2_FUNCTIONS, tmp_path, qtbot)
+        code = """
+        @profile
+        def profiled_function1():
+            return "This was profiled"
+
+        @profile
+        def profiled_function2():
+            return "This was profiled too"
+
+        profiled_function1()
+        profiled_function2()
+        """
+        win = run_code(code, tmp_path, qtbot)
 
         lprof_path = tmp_path / "script.lprof"
         assert lprof_path.is_file()
@@ -115,7 +102,12 @@ class TestMainWindow:
         assert tree.topLevelItemCount() == 2  # functions profiled
 
     def test_function_not_called(self, qtbot, tmp_path):
-        win = run_code(SCRIPT_FUNCTION_NOT_CALLED, tmp_path, qtbot)
+        code = """
+        @profile
+        def not_profiled_function():
+            return "This was not profiled"
+        """
+        win = run_code(code, tmp_path, qtbot)
 
         lprof_path = tmp_path / "script.lprof"
         assert lprof_path.is_file()
@@ -128,7 +120,13 @@ class TestMainWindow:
         assert tree.topLevelItemCount() == 1  # function decorated but not profiled
 
     def test_warn_no_decorator(self, qtbot, tmp_path):
-        win = run_code(SCRIPT_NO_DECORATOR, tmp_path, qtbot)
+        code = """
+        def not_profiled_function():
+            return "This was not profiled"
+
+        not_profiled_function()
+        """
+        win = run_code(code, tmp_path, qtbot)
 
         # No error
         lprof_path = tmp_path / "script.lprof"

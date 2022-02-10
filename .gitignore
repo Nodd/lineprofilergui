@@ -8,5 +8,9 @@ __pycache__/
 *.egg-info/
 dist/
 
+# PyTest
+.coverage
+htmlcov/
+
 # Editors
 .vscode/

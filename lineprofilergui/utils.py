@@ -35,7 +35,7 @@ PIXMAPS = {}
 PIXMAP_SIZE = 16
 
 
-def _icons_factory():
+def icons_factory():
     for k, v in _ICON_IDS.items():
         icon = QtWidgets.QApplication.style().standardIcon(v)
         ICONS[k] = icon

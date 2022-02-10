@@ -15,6 +15,10 @@ LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
 
 
 class UI_MainWindow(QtWidgets.QMainWindow):
+
+    # Used for testing purposes
+    profile_finished = QtCore.Signal()
+
     def __init__(self):
         self.config = Config()
 
@@ -277,6 +281,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             duration=profile_duration_str, time=profile_time_str
         )
         self.load_lprof(self.config.stats, title)
+        self.profile_finished.emit()
 
     def load_lprof(self, lprof_file, title=None):
         profile_data = load_profile_data(lprof_file)

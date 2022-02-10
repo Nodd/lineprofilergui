@@ -4,7 +4,7 @@ import argparse
 from qtpy import QtCore, QtWidgets
 
 from .gui import UI_MainWindow
-from .utils import _icons_factory
+from .utils import icons_factory
 from . import __version__
 
 
@@ -15,7 +15,7 @@ def positive_float(value):
     return val
 
 
-def commandline_args():
+def commandline_args(args):
     """Manage arguments with argparse"""
 
     parser = argparse.ArgumentParser(
@@ -39,19 +39,19 @@ def commandline_args():
     parser.add_argument("script", nargs="?", help="The python script file to run")
     parser.add_argument("args", nargs="...", help="Optional script arguments")
 
-    options = parser.parse_args()
+    if args is None:
+        args = sys.argv[1:]
+    options = parser.parse_args(args)
 
     options.args = " ".join(options.args)
 
     return options
 
 
-def main():
-    options = commandline_args()
+def make_window(args=None):
+    options = commandline_args(args)
 
-    # Create Qt application
-    app = QtWidgets.QApplication([])
-    _icons_factory()
+    icons_factory()
 
     # Used for QSettings
     QtCore.QCoreApplication.setOrganizationName("OpenPyUtils")
@@ -77,6 +77,13 @@ def main():
     elif not options.lprof:
         win.configure()
 
+    return win
+
+
+def main():
+    # Create Qt application
+    app = QtWidgets.QApplication([])
+    win = make_window()
     # Run Qt event loop
     sys.exit(app.exec_())
 

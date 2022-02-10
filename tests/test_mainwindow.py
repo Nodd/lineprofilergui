@@ -23,17 +23,17 @@ profiled_function1()
 profiled_function2()
 """
 
+SCRIPT_FUNCTION_NOT_CALLED = """
+@profile
+def not_profiled_function():
+    return "This was not profiled"
+"""
+
 SCRIPT_NO_DECORATOR = """
 def not_profiled_function():
     return "This was not profiled"
 
 not_profiled_function()
-"""
-
-SCRIPT_FUNCTION_NOT_CALLED = """
-@profile
-def not_profiled_function():
-    return "This was not profiled"
 """
 
 
@@ -113,6 +113,19 @@ class TestMainWindow:
 
         tree = win.resultsTreeWidget
         assert tree.topLevelItemCount() == 2  # functions profiled
+
+    def test_function_not_called(self, qtbot, tmp_path):
+        win = run_code(SCRIPT_FUNCTION_NOT_CALLED, tmp_path, qtbot)
+
+        lprof_path = tmp_path / "script.lprof"
+        assert lprof_path.is_file()
+        assert (
+            win.dockOutputWidget.outputWidget.toPlainText()
+            == f"Wrote profile results to {lprof_path}\n"
+        )
+
+        tree = win.resultsTreeWidget
+        assert tree.topLevelItemCount() == 1  # function decorated but not profiled
 
     def test_warn_no_decorator(self, qtbot, tmp_path):
         win = run_code(SCRIPT_NO_DECORATOR, tmp_path, qtbot)

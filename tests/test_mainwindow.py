@@ -145,3 +145,26 @@ class TestMainWindow:
             == "No timings to display. Did you forget to add @profile decorators ?"
         )
         assert warn_item.data(0, Qt.UserRole) is None
+
+    def test_collapse_expand(self, qtbot, tmp_path):
+        code = """
+        @profile
+        def profiled_function():
+            return "This was profiled"
+
+        profiled_function()
+        """
+        win = run_code(code, tmp_path, qtbot)
+        scriptfile = str(tmp_path / "script.py")
+
+        tree = win.resultsTreeWidget
+        func_item = tree.topLevelItem(0)
+
+        assert func_item.isExpanded()  # only 1 function, expanded
+        assert tree.expanded_functions == {(scriptfile, "profiled_function")}
+
+        func_item.setExpanded(False)
+        assert tree.expanded_functions == set()
+
+        func_item.setExpanded(True)
+        assert tree.expanded_functions == {(scriptfile, "profiled_function")}

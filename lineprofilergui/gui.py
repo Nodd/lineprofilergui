@@ -311,6 +311,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
                     )
                 )
 
+        # For testing purposes
         self.profile_finished.emit()
 
     def load_lprof(self, lprof_file, title=None):

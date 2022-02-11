@@ -136,7 +136,10 @@ class LineData:
     @property
     def color(self):
         color = QtGui.QColor(self._func_data.color)  # Makes a copy
-        ratio = self.total_time / self._func_data.total_time
+        if self._func_data.total_time > 0:
+            ratio = self.total_time / self._func_data.total_time
+        else:
+            ratio = 0
         ratio = math.log10(9 * ratio + 1)  # Logarithmic while keeping 0 <= ratio <= 1
         color.setAlphaF(ratio)
         return QtGui.QBrush(color)

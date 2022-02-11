@@ -31,7 +31,7 @@ def commandline_args(args):
         "-r", "--run", action="store_true", help="Profile the python script on launch"
     )
     parser.add_argument(
-        "-o", "--outfile", help="Save stats to OUTFILE (default: 'scriptname.lprof')",
+        "-o", "--outfile", help="Save stats to OUTFILE (default is a temporary file)",
     )
     parser.add_argument(
         "-s", "--setup", help="Python script to execute before the code to profile"

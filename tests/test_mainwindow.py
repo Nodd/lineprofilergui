@@ -1,5 +1,6 @@
 import textwrap
 import subprocess
+from pathlib import Path
 
 from qtpy import QtCore
 from qtpy.QtCore import Qt
@@ -44,7 +45,7 @@ class TestMainWindow:
         win = run_code(code, tmp_path, qtbot)
         scriptfile = str(tmp_path / "script.py")
 
-        lprof_path = tmp_path / "script.lprof"
+        lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
             win.dockOutputWidget.outputWidget.toPlainText()
@@ -101,7 +102,7 @@ class TestMainWindow:
         """
         win = run_code(code, tmp_path, qtbot)
 
-        lprof_path = tmp_path / "script.lprof"
+        lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
             win.dockOutputWidget.outputWidget.toPlainText()
@@ -120,7 +121,7 @@ class TestMainWindow:
         """
         win = run_code(code, tmp_path, qtbot)
 
-        lprof_path = tmp_path / "script.lprof"
+        lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
             win.dockOutputWidget.outputWidget.toPlainText()
@@ -141,7 +142,7 @@ class TestMainWindow:
         win = run_code(code, tmp_path, qtbot)
 
         # No error
-        lprof_path = tmp_path / "script.lprof"
+        lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
             win.dockOutputWidget.outputWidget.toPlainText()

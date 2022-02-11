@@ -2,6 +2,8 @@ import os
 import shutil
 import shlex
 from pathlib import Path
+import tempfile
+from functools import cached_property
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
@@ -17,9 +19,25 @@ class Config:
         self.script = None
         self.args = ""
         self.warmup = None
+        self.stats_tmp = True
         self.config_env = ""
         self.config_stats = None
         self.config_kernprof = None
+
+        self._temp_dir_obj = None
+        self._temp_dir = None
+
+    @cached_property
+    def temp_dir(self):
+        self._temp_dir_obj = tempfile.TemporaryDirectory(
+            prefix="lineprofilergui_", suffix="_lprof"
+        )
+        print(self._temp_dir_obj.name)
+        return self._temp_dir_obj.name
+
+    def __del__(self):
+        if self._temp_dir_obj:
+            self._temp_dir_obj.cleanup()
 
     @property
     def wdir(self):
@@ -53,7 +71,10 @@ class Config:
 
     @property
     def stats(self):
-        return self.config_stats or self.default_stats
+        if self.stats_tmp:
+            return os.fspath(Path(self.temp_dir) / (Path(self.script).stem + ".lprof"))
+        else:
+            return self.config_stats or self.default_stats
 
     @property
     def default_stats(self):
@@ -67,7 +88,7 @@ class Config:
 
     @property
     def isvalid_stats(self):
-        if not self.config_stats:
+        if not self.config_stats or self.stats_tmp:
             return True
         return (
             not self.config_stats.endswith(("/", "\\"))
@@ -131,6 +152,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.warmupWidget.setText(self.config.warmup)
         self.envWidget.setText(self.config.config_env)
         self.statsWidget.setText(self.config.config_stats)
+        self.statsTmp.setChecked(self.config.stats_tmp)
         self.kernprofWidget.setText(self.config.config_kernprof)
 
         self.update()
@@ -144,11 +166,11 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         config.warmup = self.warmupWidget.text() or None
         config.config_env = self.envWidget.text()
         config.config_stats = self.statsWidget.text() or None
+        config.stats_tmp = self.statsTmp.isChecked()
         config.config_kernprof = self.kernprofWidget.text() or None
 
     def update(self):
         self.wdirWidget.setPlaceholderText(self.config.default_wdir)
-        self.update_stats_placeholder()
         self.kernprofWidget.setPlaceholderText(self.config.default_kernprof)
         self.on_wdirWidget_textChanged("")
         self.on_scriptWidget_textChanged("")
@@ -158,9 +180,17 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.on_envWidget_textChanged("")
 
     def update_stats_placeholder(self):
-        self.statsWidget.setPlaceholderText(
-            self.config.default_stats_for_script(self.scriptWidget.text())
-        )
+        if not self.config.stats_tmp:
+            self.statsWidget.setPlaceholderText(
+                self.config.default_stats_for_script(self.scriptWidget.text())
+            )
+        else:
+            self.statsWidget.setPlaceholderText("")
+
+    def update_stats_enabled(self):
+        stats_tmp = self.statsTmp.isChecked()
+        self.statsWidget.setEnabled(not stats_tmp)
+        self.statsButton.setEnabled(not stats_tmp)
 
     def setup_ui(self):
         # Dialog
@@ -269,6 +299,9 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
             row, QtWidgets.QFormLayout.LabelRole, self.statsLabel
         )
         self.statsLayout = QtWidgets.QHBoxLayout()
+        self.statsTmp = QtWidgets.QCheckBox(self)
+        self.statsTmp.setObjectName("statsTmp")
+        self.statsLayout.addWidget(self.statsTmp)
         self.statsWidget = QtWidgets.QLineEdit(self)
         self.statsWidget.setObjectName("statsWidget")
         self.statsLayout.addWidget(self.statsWidget)
@@ -340,6 +373,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.argsLabel.setText(_("Script args"))
         self.envLabel.setText(_("Environment variables"))
         self.statsLabel.setText(_("Stats filename"))
+        self.statsTmp.setText(_("Temporary file"))
         self.statsButton.setText(_("Select..."))
         self.kernprofLabel.setText(_("<tt>kernprof</tt> path"))
         self.kernprofButton.setText(_("Select..."))
@@ -387,6 +421,11 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot(str)
     def on_statsWidget_textChanged(self, text):
+        self.display_status(self.statsWidget, self.statsStatusLabel)
+
+    @QtCore.Slot(int)
+    def on_statsTmp_stateChanged(self, state):
+        self.update_stats_enabled()
         self.display_status(self.statsWidget, self.statsStatusLabel)
 
     @QtCore.Slot(str)

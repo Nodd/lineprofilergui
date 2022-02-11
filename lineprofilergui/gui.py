@@ -1,7 +1,11 @@
 import datetime
 import os
+import sys
 from pathlib import Path
+import textwrap
+import urllib
 
+import qtpy
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
 import qtpy.compat as qtcompat
@@ -11,7 +15,9 @@ from .tree import ResultsTreeWidget, load_profile_data
 from .settings import UI_SettingsDialog
 from .utils import translate as _, MONOSPACE_FONT, ICONS, PIXMAPS
 from .process import KernprofRun
+from . import __version__
 
+LINE_PROFILER_GUI_GITHUB_URL = "https://github.com/Nodd/lineprofilergui"
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
 
 
@@ -67,6 +73,10 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionSettings.setIcon(ICONS["SETTINGS"])
         self.actionLine_profiler_documentation = QtWidgets.QAction(self)
         self.actionLine_profiler_documentation.setIcon(ICONS["HELP"])
+        self.actionGithubLink = QtWidgets.QAction(self)
+        self.actionGithubLink.setIcon(ICONS["INFO"])
+        self.actionReportBug = QtWidgets.QAction(self)
+        self.actionReportBug.setIcon(ICONS["ERROR"])
         self.actionAbout_Qt = QtWidgets.QAction(self)
         self.actionAbout_Qt.setIcon(ICONS["QT"])
 
@@ -98,6 +108,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         # Help Menu
         self.menuHelp = QtWidgets.QMenu(self.menubar)
         self.menuHelp.addAction(self.actionLine_profiler_documentation)
+        self.menuHelp.addAction(self.actionGithubLink)
+        self.menuHelp.addAction(self.actionReportBug)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout_Qt)
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -155,6 +167,12 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.actionLine_profiler_documentation.triggered.connect(
             lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl(LINE_PROFILER_DOC_URL))
         )
+        self.actionGithubLink.triggered.connect(
+            lambda: QtGui.QDesktopServices.openUrl(
+                QtCore.QUrl(LINE_PROFILER_GUI_GITHUB_URL)
+            )
+        )
+        self.actionReportBug.triggered.connect(self.report_bug)
         self.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.kernprof_run.output_text.connect(self.dockOutputWidget.append_log_text)
         self.kernprof_run.output_error.connect(self.dockOutputWidget.append_log_error)
@@ -186,6 +204,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
             _("&Line-profiler documentation...")
         )
         self.actionLine_profiler_documentation.setShortcut(_("F1"))
+        self.actionGithubLink.setText(_("&Github project..."))
+        self.actionReportBug.setText(_("&Report bug..."))
         self.actionAbout_Qt.setText(_("&About Qt..."))
 
     def update_window_title(self):
@@ -328,6 +348,31 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         if index < 0:
             return
         self.resultsTreeWidget.show_tree(self.historyCombo.currentData())
+
+    @QtCore.Slot()
+    def report_bug(self):
+        from line_profiler import __version__ as line_profiler_version
+
+        body = textwrap.dedent(
+            f"""
+            # Description of the problem
+            <!-- Explain your problem in detail -->
+
+
+
+
+
+            # Environment and versions
+            * **Line Profiler GUI**: *{__version__}*
+            * **python**: *{sys.version}*
+            * **OS**: *{sys.platform}*
+            * **line_profiler**: *{line_profiler_version}*
+            * **QtPy API**: *{qtpy.API} {qtpy.PYQT_VERSION if qtpy.API.startswith("pyqt") else qtpy.PYSIDE_VERSION}*
+            * **Qt**: *{qtpy.QT_VERSION}*
+            """
+        ).strip()
+        url = f"{LINE_PROFILER_GUI_GITHUB_URL}/issues/new?body={urllib.parse.quote_plus(body)}"
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
 
 
 class DockOutputWidget(QtWidgets.QDockWidget):

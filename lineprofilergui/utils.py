@@ -24,9 +24,9 @@ _ICON_IDS = {
     "COLLAPSE": QtWidgets.QStyle.SP_ToolBarHorizontalExtensionButton,  # actionCollapse_all
     "QT": QtWidgets.QStyle.SP_TitleBarMenuButton,  # actionAbout_Qt
     "HELP": QtWidgets.QStyle.SP_DialogHelpButton,  # actionLine_profiler_documentation
-    "INFO": QtWidgets.QStyle.SP_MessageBoxInformation,  # actionShowOutput
+    "INFO": QtWidgets.QStyle.SP_MessageBoxInformation,  # actionShowOutput, actionGithubLink
     "WARNING": QtWidgets.QStyle.SP_MessageBoxWarning,  # actionShowOutput
-    "ERROR": QtWidgets.QStyle.SP_MessageBoxCritical,
+    "ERROR": QtWidgets.QStyle.SP_MessageBoxCritical,  # actionReportBug
     "RUNNING": QtWidgets.QStyle.SP_BrowserReload,  # statusbar_running_indicator, actionShowOutput
 }
 

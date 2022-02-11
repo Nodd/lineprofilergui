@@ -204,6 +204,22 @@ class TestMainWindow:
                 win.actionRun.trigger()
                 win.actionAbort.trigger()
 
+    def test_load_lprof(self, qtbot, tmp_path):
+        """Check that laoding a .lprof file directly works"""
+        code = """
+        @profile
+        def profiled_function():
+            return "This was profiled"
+
+        profiled_function()
+        """
+        win = run_code(code, tmp_path, qtbot)
+        lprof_path = Path(win.config.stats)
+        assert lprof_path.is_file()
+
+        win.load_lprof(str(lprof_path))
+        assert win.historyCombo.count() == 2  # Initial profiling + lprof load
+
     def test_collapse_expand(self, qtbot, tmp_path):
         """Check the tracking of expanded functions"""
         code = """

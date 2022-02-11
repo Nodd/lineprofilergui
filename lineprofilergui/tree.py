@@ -110,7 +110,7 @@ class LineData:
 
     @property
     def percent_str(self):
-        if self.total_time is None:
+        if self.total_time is None or self._func_data.total_time == 0:
             return ""
         percent = 100 * self.total_time / self._func_data.total_time
         return f"{percent:.1f}"

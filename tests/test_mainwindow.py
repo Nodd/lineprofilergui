@@ -303,4 +303,3 @@ class TestMainWindow:
         # Check that the editor command given to subprocess.Popen is correct
         scriptname_escaped = str(tmp_path / "script.py").replace("\\", "\\\\")
         assert popen_args == [(f'editor "{scriptname_escaped}":3', False)]
-

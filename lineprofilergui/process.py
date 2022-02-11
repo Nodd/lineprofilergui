@@ -57,7 +57,7 @@ class KernprofRun(QtCore.QObject):
             QtCore.QIODevice.ReadOnly | QtCore.QIODevice.Unbuffered,
         )
 
-        # Update file cache, to be able to load the code from profiled files in the state that they were run (as much as possible...)
+        # Check file cache now, to try to keep profiled files in the state that they were run
         linecache.checkcache()
 
         running = self.process.waitForStarted()

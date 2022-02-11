@@ -57,7 +57,9 @@ class FunctionData:
         # is a chance that the correct version was in cache and we get
         # the correct lines.
         all_lines = linecache.getlines(self.filename)
-        self.code_lines = inspect.getblock(all_lines[self.start_line_no :])
+        self.code_lines = inspect.getblock(
+            all_lines[self.start_line_no :]  # noqa: E203
+        )
 
     def parse_stats(self, stats):
         self.line_data = []

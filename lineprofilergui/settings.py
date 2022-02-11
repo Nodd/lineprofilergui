@@ -74,12 +74,13 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         self.reject()  # Load settings values
 
     def retranslate_ui(self):
-        _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_("Line Profiler GUI - Settings"))
         self.editorCommandGroupBox.setTitle(_("Open file"))
         self.editorCommandLabel.setText(
             _(
-                "Command to run when a line is double-clicked in the profiling result panel. <tt>{file}</tt> will be replaced by the stringified filename, and <tt>{line}</tt> will be replaced by the line number."
+                "Command to run when a line is double-clicked in the profiling result panel."
+                " <tt>{file}</tt> will be replaced by the stringified filename,"
+                " and <tt>{line}</tt> will be replaced by the line number."
             )
         )
         self.columnsGroupBox.setTitle(_("Visible colums"))

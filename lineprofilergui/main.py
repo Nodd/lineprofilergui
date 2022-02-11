@@ -83,7 +83,7 @@ def make_window(args=None):
 def main():
     # Create Qt application
     app = QtWidgets.QApplication([])
-    win = make_window()
+    win = make_window()  # noqa: F841
     # Run Qt event loop
     sys.exit(app.exec_())
 

@@ -41,5 +41,4 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude example
       - name: Test with pytest
         run: |
-          export QT_DEBUG_PLUGINS=1
           pytest -vv -s

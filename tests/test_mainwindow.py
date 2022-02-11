@@ -180,6 +180,29 @@ class TestMainWindow:
         lines = log.split("\n")
         assert lines[-1] == "ZeroDivisionError: division by zero"
 
+    def test_script_kill(self, qtbot, tmp_path):
+        """Check the case of a scrpit killed"""
+        code = """
+        import time
+        def long_running_function():
+            time.sleep(10)
+
+        long_running_function()
+        """
+        scriptfile = tmp_path / "script.py"
+        scriptfile.write_text(textwrap.dedent(code))
+
+        with tmp_path:
+            main.icons_factory()
+            win = main.UI_MainWindow()
+            qtbot.addWidget(win)
+
+            win.config.script = str(scriptfile)
+
+            with qtbot.waitSignal(win.profile_finished, timeout=5000):
+                win.actionRun.trigger()
+                win.actionAbort.trigger()
+
     def test_collapse_expand(self, qtbot, tmp_path):
         """Check the tracking of expanded functions"""
         code = """

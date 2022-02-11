@@ -228,7 +228,9 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
         # Display a warning in case of empty profile data
         if not profiledata:
-            self.warn_no_data()
+            self.warning_message(
+                _("No timings to display. Did you forget to add @profile decorators ?")
+            )
             return
 
         for func_data in profiledata:
@@ -283,13 +285,9 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         item.setData(self.COL_LINE, Qt.DisplayRole, line_data.code)
         item.setFont(self.COL_LINE, MONOSPACE_FONT)
 
-    def warn_no_data(self):
+    def warning_message(self, text):
         warn_item = QtWidgets.QTreeWidgetItem(self)
-        warn_item.setData(
-            self.COL_0,
-            Qt.DisplayRole,
-            _("No timings to display. Did you forget to add @profile decorators ?"),
-        )
+        warn_item.setData(self.COL_0, Qt.DisplayRole, text)
         warn_item.setFirstColumnSpanned(True)
         warn_item.setTextAlignment(self.COL_0, Qt.AlignCenter)
         font = warn_item.font(self.COL_0)

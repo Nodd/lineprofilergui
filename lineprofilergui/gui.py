@@ -1,5 +1,6 @@
 import datetime
 import os
+from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
@@ -240,6 +241,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
                 return
 
         # Start process
+        Path(self.config.stats).unlink(missing_ok=True)
         self.dockOutputWidget.clear()
         process = self.kernprof_run.prepare()
         process.stateChanged.connect(self.set_running_state)
@@ -264,23 +266,46 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot(int, QtCore.QProcess.ExitStatus)
     def process_finished(self, exit_code, exit_status):
+        """Note: if process was aborted, exit_status should be 1"""
+        # Time and duration values
         profile_stop_time = datetime.datetime.now()
         profile_duration = profile_stop_time - self.profile_start_time
         profile_time_str = profile_stop_time.strftime("%X")
         profile_duration_str = str(profile_duration).lstrip("0:")
         if profile_duration_str.startswith("."):
             profile_duration_str = "0" + profile_duration_str
-        self.statusbar_time.setText(
-            _("Last profiling ended at {time} and ran for {duration}s").format(
-                time=profile_time_str, duration=profile_duration_str,
-            )
-        )
-        self.dockOutputWidget.set_exit_state(exit_code or exit_status)
 
+        # Statusbar text
+        if exit_status:
+            text = _(
+                "Last profiling was terminated at {time} after running for {duration}s"
+            ).format(time=profile_time_str, duration=profile_duration_str,)
+        elif exit_code:
+            text = _(
+                "Last profiling terminated with exit code {code} at {time} after running for {duration}s"
+            ).format(
+                code=exit_code, time=profile_time_str, duration=profile_duration_str
+            )
+        else:
+            text = _("Last profiling ended at {time} and ran for {duration}s").format(
+                time=profile_time_str, duration=profile_duration_str
+            )
+        self.statusbar_time.setText(text)
+
+        # Output console status
+        self.dockOutputWidget.set_exit_state(exit_status or exit_code)
+
+        # Load .lprof file
         title = _("{duration}s at {time}").format(
             duration=profile_duration_str, time=profile_time_str
         )
-        self.load_lprof(self.config.stats, title)
+        try:
+            self.load_lprof(self.config.stats, title)
+        except FileNotFoundError:
+            self.resultsTreeWidget.warning_message(
+                _("Profiling results not found: {file}").format(file=self.config.stats)
+            )
+
         self.profile_finished.emit()
 
     def load_lprof(self, lprof_file, title=None):

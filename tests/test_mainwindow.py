@@ -35,7 +35,6 @@ class TestMainWindow:
 
     def test_profile_1_function(self, qtbot, tmp_path):
         """Check that the result tree is filled correctly"""
-        print(1)
         code = """
         @profile
         def profiled_function():
@@ -43,16 +42,11 @@ class TestMainWindow:
 
         profiled_function()
         """
-        print(2)
         win = run_code(code, tmp_path, qtbot)
-        print(3)
         scriptfile = str(tmp_path / "script.py")
-        print(4)
 
         lprof_path = Path(win.config.stats)
-        print(5)
         assert lprof_path.is_file()
-        print(6)
         assert (
             win.dockOutputWidget.outputWidget.toPlainText()
             == f"Wrote profile results to {lprof_path}\n"

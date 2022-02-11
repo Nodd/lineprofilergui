@@ -158,6 +158,28 @@ class TestMainWindow:
         )
         assert warn_item.data(0, Qt.UserRole) is None
 
+    def test_script_error(self, qtbot, tmp_path):
+        """Check the case of the script ending with an error"""
+        code = "1 / 0"
+
+        scriptfile = tmp_path / "script.py"
+        scriptfile.write_text(textwrap.dedent(code))
+
+        with tmp_path:
+            main.icons_factory()
+            win = main.UI_MainWindow()
+            qtbot.addWidget(win)
+
+            win.config.script = str(scriptfile)
+            win.dockOutputWidget.hide()
+
+            with qtbot.waitSignal(win.profile_finished, timeout=5000):
+                win.actionRun.trigger()
+
+        log = win.dockOutputWidget.outputWidget.toPlainText()
+        lines = log.split("\n")
+        assert lines[-1] == "ZeroDivisionError: division by zero"
+
     def test_collapse_expand(self, qtbot, tmp_path):
         """Check the tracking of expanded functions"""
         code = """

@@ -204,6 +204,13 @@ class TestMainWindow:
                 win.actionRun.trigger()
                 win.actionAbort.trigger()
 
+        tree = win.resultsTreeWidget
+        assert tree.topLevelItemCount() == 1  # Warning
+
+        warn_item = tree.topLevelItem(0)
+        assert warn_item.data(0, Qt.DisplayRole) == "No profiling results"
+        assert warn_item.data(0, Qt.UserRole) is None
+
     def test_load_lprof(self, qtbot, tmp_path):
         """Check that laoding a .lprof file directly works"""
         code = """

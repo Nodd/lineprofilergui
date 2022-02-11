@@ -302,9 +302,14 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         try:
             self.load_lprof(self.config.stats, title)
         except FileNotFoundError:
-            self.resultsTreeWidget.warning_message(
-                _("Profiling results not found: {file}").format(file=self.config.stats)
-            )
+            if self.config.stats_tmp:
+                self.resultsTreeWidget.warning_message(_("No profiling results"))
+            else:
+                self.resultsTreeWidget.warning_message(
+                    _('Profiling results not found: "{file}"').format(
+                        file=self.config.stats
+                    )
+                )
 
         self.profile_finished.emit()
 

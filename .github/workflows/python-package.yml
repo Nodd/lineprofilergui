@@ -26,11 +26,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
           cache-dependency-path: "setup.cfg"
-      - uses: actions/cache@v2
-        # https://blog.allenai.org/python-caching-in-github-actions-e9452698e98d
-        with:
-          path: ${{ env.pythonLocation }}
-          key: python-${{ env.pythonLocation }}-${{ hashFiles('setup.cfg') }}
       - name: Install Qt dependencies
         run: |
           # from https://pytest-qt.readthedocs.io/en/latest/troubleshooting.html#github-actions

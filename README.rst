@@ -1,5 +1,13 @@
 Line Profiler GUI
 -----------------
+.. image:: https://img.shields.io/github/license/Nodd/lineprofilergui
+  :target: https://github.com/Nodd/lineprofilergui/blob/master/LICENSE.txt
+.. image:: https://img.shields.io/pypi/v/line-profiler-gui.svg
+  :target: https://pypi.python.org/pypi/line-profiler-gui/
+.. image:: https://github.com/Nodd/lineprofilergui/actions/workflows/python-package.yml/badge.svg
+  :target: https://github.com/Nodd/lineprofilergui/actions/workflows/python-package.yml
+.. image:: https://codecov.io/gh/Nodd/lineprofilergui/branch/master/graph/badge.svg?token=9O1RMPUNEU
+  :target: https://codecov.io/gh/Nodd/lineprofilergui
 
 This is a Qt GUI for the line_profiler_ python utility.
 

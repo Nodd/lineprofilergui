@@ -1,7 +1,7 @@
 import linecache
 import pickle
 import inspect
-import hashlib
+import zlib
 import os
 import functools
 import math
@@ -88,9 +88,23 @@ class FunctionData:
     @functools.cached_property
     def color(self):
         """Choose deteministic unique color for the function"""
-        md5 = hashlib.md5((self.filename + self.name).encode("utf8")).hexdigest()
-        hue = (int(md5[:2], 16) - 68) % 360  # avoid blue (unreadable)
-        color = QtGui.QColor.fromHsv(hue, 200, 255)
+        key = (self.filename + self.name).encode("utf8")
+        hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2 ** 32 * 359
+        color = QtGui.QColor.fromHsv(hue, 100, 255)
+
+        # Normalize luminance to get visually uniform colors
+        perceived_luminance = math.sqrt(
+            0.241 * color.redF() ** 2
+            + 0.691 * color.greenF() ** 2
+            + 0.068 * color.blueF() ** 2
+        )
+        perceived_luminance /= 0.642  # Normalize to stay inside the RGB range
+        color = QtGui.QColor.fromRgbF(
+            color.redF() / perceived_luminance,
+            color.greenF() / perceived_luminance,
+            color.blueF() / perceived_luminance,
+        )
+
         return color
 
     def __iter__(self):

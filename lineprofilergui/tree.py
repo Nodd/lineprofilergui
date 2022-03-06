@@ -89,7 +89,7 @@ class FunctionData:
     def color(self):
         """Choose deteministic unique color for the function"""
         key = (self.filename + self.name).encode("utf8")
-        hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2 ** 32 * 360
+        hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2**32 * 360
         color = QtGui.QColor.fromHsv(int(hue), 100, 255)
 
         # Normalize luminance to get visually uniform colors
@@ -288,12 +288,10 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
     def fill_line_item(self, item, line_data):
         item.setData(
-            self.COL_FILE_LINE, Qt.UserRole, (line_data.filename, line_data.line_no),
+            self.COL_FILE_LINE, Qt.UserRole, (line_data.filename, line_data.line_no)
         )
         item.setData(self.COL_NO, Qt.DisplayRole, line_data.line_no)
-        item.setData(
-            self.COL_PERCENT, Qt.DisplayRole, line_data.percent_str,
-        )
+        item.setData(self.COL_PERCENT, Qt.DisplayRole, line_data.percent_str)
         item.setTextAlignment(self.COL_PERCENT, Qt.AlignCenter)
         item.setData(self.COL_TIME, Qt.DisplayRole, line_data.time_str)
         item.setTextAlignment(self.COL_TIME, Qt.AlignCenter)

@@ -299,7 +299,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         if exit_status:
             text = _(
                 "Last profiling was terminated at {time} after running for {duration}s"
-            ).format(time=profile_time_str, duration=profile_duration_str,)
+            ).format(time=profile_time_str, duration=profile_duration_str)
         elif exit_code:
             text = _(
                 "Last profiling terminated with exit code {code} at {time} after running for {duration}s"

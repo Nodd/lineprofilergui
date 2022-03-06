@@ -397,7 +397,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def on_wdirButton_clicked(self):
         filename = qtcompat.getexistingdirectory(
-            self, _("Select Python script"), self.wdirWidget.text(),
+            self, _("Select Python script"), self.wdirWidget.text()
         )
         if filename:
             self.wdirWidget.setText(filename)

@@ -24,14 +24,12 @@ def commandline_args(args):
     parser.add_argument(
         "-V", "--version", action="version", version=f"%(prog)s v{__version__}"
     )
-    parser.add_argument(
-        "-l", "--lprof", help="Display data from a .lprof file",
-    )
+    parser.add_argument("-l", "--lprof", help="Display data from a .lprof file")
     parser.add_argument(
         "-r", "--run", action="store_true", help="Profile the python script on launch"
     )
     parser.add_argument(
-        "-o", "--outfile", help="Save stats to OUTFILE (default is a temporary file)",
+        "-o", "--outfile", help="Save stats to OUTFILE (default is a temporary file)"
     )
     parser.add_argument(
         "-s", "--setup", help="Python script to execute before the code to profile"

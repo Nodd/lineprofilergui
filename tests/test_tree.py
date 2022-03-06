@@ -57,9 +57,7 @@ class TestResultsTreeWidget:
             def setValue(self, key, value):
                 pass
 
-        monkeypatch.setattr(
-            QtCore, "QSettings", lambda: MockQSettings(),
-        )
+        monkeypatch.setattr(QtCore, "QSettings", lambda: MockQSettings())
 
         # Monkeypatch subprocess.Popen
         popen_args = []

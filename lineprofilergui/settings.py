@@ -97,8 +97,6 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         settings.setValue("column5Visible", self.checkBox_5.isChecked())
         QtWidgets.QDialog.accept(self)
 
-        self.parent()
-
     @QtCore.Slot()
     def reject(self):
         settings = QtCore.QSettings()

@@ -51,6 +51,17 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         self.columnsLayout.addWidget(self.checkBox_5)
         self.mainLayout.addWidget(self.columnsGroupBox)
 
+        # Theme
+        self.themeGroupBox = QtWidgets.QGroupBox(self)
+        self.themeLayout = QtWidgets.QVBoxLayout(self.themeGroupBox)
+        self.themeOS = QtWidgets.QRadioButton(self.themeGroupBox)
+        self.themeLayout.addWidget(self.themeOS)
+        self.themeLight = QtWidgets.QRadioButton(self.themeGroupBox)
+        self.themeLayout.addWidget(self.themeLight)
+        self.themeDark = QtWidgets.QRadioButton(self.themeGroupBox)
+        self.themeLayout.addWidget(self.themeDark)
+        self.mainLayout.addWidget(self.themeGroupBox)
+
         # Button box
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -87,6 +98,11 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         self.checkBox_4.setText(_("Per Hit (ms)"))
         self.checkBox_5.setText(_("% Time"))
 
+        self.themeGroupBox.setTitle(_("GUI theme"))
+        self.themeOS.setText(_("OS setting"))
+        self.themeLight.setText(_("Light"))
+        self.themeDark.setText(_("Dark"))
+
     @QtCore.Slot()
     def accept(self):
         settings = QtCore.QSettings()
@@ -95,6 +111,13 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         settings.setValue("column3Visible", self.checkBox_3.isChecked())
         settings.setValue("column4Visible", self.checkBox_4.isChecked())
         settings.setValue("column5Visible", self.checkBox_5.isChecked())
+        if self.themeOS.isChecked():
+            theme = "os"
+        elif self.themeLight.isChecked():
+            theme = "light"
+        elif self.themeDark.isChecked():
+            theme = "dark"
+        settings.setValue("theme", theme)
         QtWidgets.QDialog.accept(self)
 
     @QtCore.Slot()
@@ -105,4 +128,11 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         self.checkBox_3.setChecked(settings.value("column3Visible", True, bool))
         self.checkBox_4.setChecked(settings.value("column4Visible", True, bool))
         self.checkBox_5.setChecked(settings.value("column5Visible", True, bool))
+        theme = settings.value("theme", "os", str)
+        if theme == "light":
+            self.themeLight.setChecked(True)
+        elif theme == "dark":
+            self.themeDark.setChecked(True)
+        else:
+            self.themeOS.setChecked(True)
         QtWidgets.QDialog.reject(self)

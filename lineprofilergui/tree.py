@@ -9,8 +9,15 @@ import subprocess
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
 
 from .utils import translate as _, MONOSPACE_FONT
+
+
+LEXER = PythonLexer()
+FORMATTER = HtmlFormatter(noclasses=True)
 
 
 def load_profile_data(filename):
@@ -299,8 +306,11 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         item.setTextAlignment(self.COL_PERHIT, Qt.AlignCenter)
         item.setData(self.COL_HITS, Qt.DisplayRole, line_data.hits_str)
         item.setTextAlignment(self.COL_HITS, Qt.AlignCenter)
-        item.setData(self.COL_LINE, Qt.DisplayRole, line_data.code)
-        item.setFont(self.COL_LINE, MONOSPACE_FONT)
+
+        code = highlight(line_data.code, LEXER, FORMATTER)
+        label = QtWidgets.QLabel(code)
+        label.setTextFormat(Qt.RichText)
+        self.setItemWidget(item, self.COL_LINE, label)
 
     def warning_message(self, text):
         warn_item = QtWidgets.QTreeWidgetItem(self)

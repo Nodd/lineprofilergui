@@ -32,7 +32,6 @@ class Config:
         self._temp_dir_obj = tempfile.TemporaryDirectory(
             prefix="lineprofilergui_", suffix="_lprof"
         )
-        print(self._temp_dir_obj.name)
         return self._temp_dir_obj.name
 
     def __del__(self):

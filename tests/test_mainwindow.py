@@ -1,5 +1,6 @@
 import textwrap
 from pathlib import Path
+import xml
 
 from qtpy.QtCore import Qt
 
@@ -58,9 +59,15 @@ class TestMainWindow:
         assert func_item.child(1).data(4, Qt.DisplayRole) == "100.0"
 
         # Check code
-        assert func_item.child(0).data(5, Qt.DisplayRole) == "def profiled_function():"
+        def remove_tags(text):
+            return "".join(xml.etree.ElementTree.fromstring(text).itertext()).rstrip()
+
         assert (
-            func_item.child(1).data(5, Qt.DisplayRole)
+            remove_tags(tree.itemWidget(func_item.child(0), 5).text())
+            == "def profiled_function():"
+        )
+        assert (
+            remove_tags(tree.itemWidget(func_item.child(1), 5).text())
             == '    return "This was profiled"'
         )
 

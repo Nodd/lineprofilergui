@@ -16,6 +16,7 @@ from .settings import UI_SettingsDialog
 from .utils import translate as _, MONOSPACE_FONT, ICONS, PIXMAPS
 from .process import KernprofRun
 from . import __version__
+from .theme import update_theme
 
 LINE_PROFILER_GUI_GITHUB_URL = "https://github.com/Nodd/lineprofilergui"
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
@@ -153,6 +154,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.retranslate_ui()
         self.read_settings()
         self.set_running_state(False)
+        update_theme()
 
     def connect(self):
         self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
@@ -177,6 +179,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.kernprof_run.output_text.connect(self.dockOutputWidget.append_log_text)
         self.kernprof_run.output_error.connect(self.dockOutputWidget.append_log_error)
         self.settingsDialog.accepted.connect(self.resultsTreeWidget.updateColonsVisible)
+        self.settingsDialog.accepted.connect(update_theme)
         self.historyCombo.currentIndexChanged.connect(self.load_history)
 
     def retranslate_ui(self):

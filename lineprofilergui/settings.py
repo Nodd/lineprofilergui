@@ -37,9 +37,6 @@ class UI_SettingsDialog(QtWidgets.QDialog):
         # Columns visibility
         self.columnsGroupBox = QtWidgets.QGroupBox(self)
         self.columnsLayout = QtWidgets.QHBoxLayout(self.columnsGroupBox)
-        self.checkBox_1 = QtWidgets.QCheckBox(self.columnsGroupBox)
-        self.checkBox_1.setChecked(True)
-        self.columnsLayout.addWidget(self.checkBox_1)
         self.checkBox_2 = QtWidgets.QCheckBox(self.columnsGroupBox)
         self.checkBox_2.setChecked(True)
         self.columnsLayout.addWidget(self.checkBox_2)
@@ -83,8 +80,8 @@ class UI_SettingsDialog(QtWidgets.QDialog):
                 " and <tt>{line}</tt> will be replaced by the line number."
             )
         )
+
         self.columnsGroupBox.setTitle(_("Visible colums"))
-        self.checkBox_1.setText(_("Line #"))
         self.checkBox_2.setText(_("Hits"))
         self.checkBox_3.setText(_("Time (ms)"))
         self.checkBox_4.setText(_("Per Hit (ms)"))
@@ -94,7 +91,6 @@ class UI_SettingsDialog(QtWidgets.QDialog):
     def accept(self):
         settings = QtCore.QSettings()
         settings.setValue("editorCommand", self.editorCommandCombo.currentText())
-        settings.setValue("column1Visible", self.checkBox_1.isChecked())
         settings.setValue("column2Visible", self.checkBox_2.isChecked())
         settings.setValue("column3Visible", self.checkBox_3.isChecked())
         settings.setValue("column4Visible", self.checkBox_4.isChecked())
@@ -107,7 +103,6 @@ class UI_SettingsDialog(QtWidgets.QDialog):
     def reject(self):
         settings = QtCore.QSettings()
         self.editorCommandCombo.setCurrentText(settings.value("editorCommand", ""))
-        self.checkBox_1.setChecked(settings.value("column1Visible", True, bool))
         self.checkBox_2.setChecked(settings.value("column2Visible", True, bool))
         self.checkBox_3.setChecked(settings.value("column3Visible", True, bool))
         self.checkBox_4.setChecked(settings.value("column4Visible", True, bool))

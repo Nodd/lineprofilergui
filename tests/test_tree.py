@@ -6,10 +6,10 @@ from .utils import run_code
 
 
 class TestResultsTreeWidget:
-    """Specific checks for resultsTreeWidget behavior"""
+    """Specific checks for resultsTreeWidget behavior."""
 
     def test_collapse_expand(self, qtbot, tmp_path):
-        """Check the tracking of expanded functions"""
+        """Check the tracking of expanded functions."""
         code = """
         @profile
         def profiled_function():
@@ -33,7 +33,7 @@ class TestResultsTreeWidget:
         assert tree.expanded_functions == {(scriptfile, "profiled_function")}
 
     def test_open_editor(self, qtbot, tmp_path, monkeypatch):
-        """Check the command to open an editor at the correct line"""
+        """Check the command to open an editor at the correct line."""
         code = """
         @profile
         def profiled_function():

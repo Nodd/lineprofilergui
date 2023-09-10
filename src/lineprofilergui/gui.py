@@ -289,7 +289,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot(int, QtCore.QProcess.ExitStatus)
     def process_finished(self, exit_code, exit_status):
-        """Note: if process was aborted, exit_status should be 1"""
+        """Note: if process was aborted, exit_status should be 1."""
         # Time and duration values
         profile_stop_time = datetime.datetime.now()
         profile_duration = profile_stop_time - self.profile_start_time

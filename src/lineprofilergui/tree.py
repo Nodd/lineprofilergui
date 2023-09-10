@@ -15,7 +15,7 @@ from .utils import translate as _
 
 
 def load_profile_data(filename):
-    """Load line profiler data saved by kernprof module"""
+    """Load line profiler data saved by kernprof module."""
     # stats has the following layout :
     # stats.timings =
     #     {(filename1, line_no1, function_name1):
@@ -88,7 +88,7 @@ class FunctionData:
 
     @functools.cached_property
     def color(self):
-        """Choose deteministic unique color for the function"""
+        """Choose deteministic unique color for the function."""
         key = (self.filename + self.name).encode("utf8")
         hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2**32 * 360
         color = QtGui.QColor.fromHsv(int(hue), 100, 255)
@@ -157,7 +157,7 @@ class LineData:
 
 
 class ResultsTreeWidget(QtWidgets.QTreeWidget):
-    """Tree widget to view line_profiler results"""
+    """Tree widget to view line_profiler results."""
 
     column_header_text = [
         _("Line #"),
@@ -238,7 +238,7 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
         scrollbar.setValue(scroll)
 
     def populate_tree(self, profiledata):
-        """Create each item (and associated data) in the tree"""
+        """Create each item (and associated data) in the tree."""
         # Clear before re-populating
         self.clear()
 

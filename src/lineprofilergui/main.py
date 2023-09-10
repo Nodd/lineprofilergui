@@ -16,7 +16,7 @@ def positive_float(value):
 
 
 def commandline_args(args):
-    """Manage arguments with argparse"""
+    """Manage arguments with argparse."""
 
     parser = argparse.ArgumentParser(
         description="Run, profile a python script and display results."

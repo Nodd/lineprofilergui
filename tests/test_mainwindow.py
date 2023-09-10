@@ -9,14 +9,14 @@ from .utils import run_code
 
 
 class TestMainWindow:
-    """Global checks for the main window and profiling results
+    """Global checks for the main window and profiling results.
 
     Those are more functional tests rather than unit tests,
     but at least is assures that there is no basic problem in most of the code.
     """
 
     def test_profile_1_function(self, qtbot, tmp_path):
-        """Check that the result tree is filled correctly"""
+        """Check that the result tree is filled correctly."""
         code = """
         @profile
         def profiled_function():
@@ -69,7 +69,7 @@ class TestMainWindow:
         assert func_item.child(1).data(0, Qt.UserRole) == (scriptfile, 4)
 
     def test_profile_2_functions(self, qtbot, tmp_path):
-        """Check the profiling of 2 different functions"""
+        """Check the profiling of 2 different functions."""
         code = """
         @profile
         def profiled_function1():
@@ -95,7 +95,7 @@ class TestMainWindow:
         assert tree.topLevelItemCount() == 2  # functions profiled
 
     def test_function_not_called(self, qtbot, tmp_path):
-        """Check the case of a decoracted function not called"""
+        """Check the case of a decoracted function not called."""
         code = """
         @profile
         def not_profiled_function():
@@ -114,7 +114,7 @@ class TestMainWindow:
         assert tree.topLevelItemCount() == 1  # function decorated but not profiled
 
     def test_warn_no_decorator(self, qtbot, tmp_path):
-        """Check the case of no @profile decorator in script"""
+        """Check the case of no @profile decorator in script."""
         code = """
         def not_profiled_function():
             return "This was not profiled"
@@ -142,7 +142,7 @@ class TestMainWindow:
         assert warn_item.data(0, Qt.UserRole) is None
 
     def test_script_error(self, qtbot, tmp_path):
-        """Check the case of the script ending with an error"""
+        """Check the case of the script ending with an error."""
         code = "1 / 0"
         win = run_code(code, tmp_path, qtbot)
 
@@ -151,7 +151,7 @@ class TestMainWindow:
         assert lines[-1] == "ZeroDivisionError: division by zero"
 
     def test_script_kill(self, qtbot, tmp_path):
-        """Check the case of a script killed"""
+        """Check the case of a script killed."""
         code = """
         import time
         def long_running_function():
@@ -181,7 +181,7 @@ class TestMainWindow:
         assert warn_item.data(0, Qt.UserRole) is None
 
     def test_load_lprof(self, qtbot, tmp_path):
-        """Check that laoding a .lprof file directly works"""
+        """Check that laoding a .lprof file directly works."""
         code = """
         @profile
         def profiled_function():

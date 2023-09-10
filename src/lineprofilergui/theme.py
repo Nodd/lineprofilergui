@@ -48,7 +48,7 @@ def apply_default_theme():
 
 
 def is_windows_dark_theme():
-    """Detect Windows theme"""
+    """Detect Windows theme."""
     # From https://successfulsoftware.net/2021/03/31/how-to-add-a-dark-theme-to-your-qt-application/
     settings = QtCore.QSettings(
         "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",

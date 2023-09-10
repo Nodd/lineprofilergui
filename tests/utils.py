@@ -4,7 +4,7 @@ from lineprofilergui import main
 
 
 def run_code(code, tmp_path, qtbot):
-    """Helper function to run profiled code from UI_MainWindow"""
+    """Helper function to run profiled code from UI_MainWindow."""
     scriptfile = tmp_path / "script.py"
     scriptfile.write_text(textwrap.dedent(code))
 

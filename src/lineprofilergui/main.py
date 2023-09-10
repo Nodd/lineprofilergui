@@ -4,7 +4,7 @@ import sys
 from qtpy import QtCore, QtWidgets
 
 from . import __version__
-from .gui import UI_MainWindow
+from .gui import UIMainWindow
 from .utils import icons_factory
 
 
@@ -17,7 +17,6 @@ def positive_float(value):
 
 def commandline_args(args):
     """Manage arguments with argparse."""
-
     parser = argparse.ArgumentParser(
         description="Run, profile a python script and display results."
     )
@@ -56,7 +55,7 @@ def make_window(args=None):
     QtCore.QCoreApplication.setApplicationName("Line Profiler Gui")
 
     # Create main window
-    win = UI_MainWindow()
+    win = UIMainWindow()
     win.show()
 
     if options.lprof:

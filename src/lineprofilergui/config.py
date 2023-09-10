@@ -72,8 +72,7 @@ class Config:
     def stats(self):
         if self.stats_tmp:
             return os.fspath(Path(self.temp_dir) / f"{Path(self.script).stem}.lprof")
-        else:
-            return self.config_stats or self.default_stats
+        return self.config_stats or self.default_stats
 
     @property
     def default_stats(self):
@@ -115,7 +114,7 @@ class Config:
     @property
     def isvalid_env(self):
         try:
-            self.env
+            self.env  # noqa: B018
         except ValueError:
             return False
         return True
@@ -132,7 +131,7 @@ class Config:
         )
 
 
-class Ui_ConfigDialog(QtWidgets.QDialog):
+class UiConfigDialog(QtWidgets.QDialog):
     def __init__(self, parent, config):
         self.config = config
 
@@ -188,7 +187,7 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
         self.statsWidget.setEnabled(not stats_tmp)
         self.statsButton.setEnabled(not stats_tmp)
 
-    def setup_ui(self):
+    def setup_ui(self):  # noqa: PLR0915
         # Dialog
         self.setObjectName("self")
         self.resize(600, 186)
@@ -477,18 +476,18 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
 
 class ConfigValidator(QtGui.QValidator):
-    def __init__(self, configDialog, widgetID):
+    def __init__(self, config_dialog, widget_id):
         super().__init__()
-        self.configDialog = configDialog
-        self.widgetID = widgetID
+        self.config_dialog = config_dialog
+        self.widget_id = widget_id
 
     @QtCore.Slot(str, int)
     def validate(self, text, pos):
         config = Config()
-        self.configDialog.ui_to_config(config)
+        self.config_dialog.ui_to_config(config)
         return (
             QtGui.QValidator.Acceptable
-            if getattr(config, f"isvalid_{self.widgetID}")
+            if getattr(config, f"isvalid_{self.widget_id}")
             else QtGui.QValidator.Intermediate,
             text,
             pos,

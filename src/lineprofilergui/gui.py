@@ -11,9 +11,9 @@ from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
 
 from . import __version__
-from .config import Config, Ui_ConfigDialog
+from .config import Config, UiConfigDialog
 from .process import KernprofRun
-from .settings import UI_SettingsDialog
+from .settings import UISettingsDialog
 from .theme import update_theme
 from .tree import ResultsTreeWidget, load_profile_data
 from .utils import ICONS, MONOSPACE_FONT, PIXMAPS
@@ -23,7 +23,7 @@ LINE_PROFILER_GUI_GITHUB_URL = "https://github.com/Nodd/lineprofilergui"
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
 
 
-class UI_MainWindow(QtWidgets.QMainWindow):
+class UIMainWindow(QtWidgets.QMainWindow):
     # Used for testing purposes
     profile_finished = QtCore.Signal()
 
@@ -37,7 +37,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
         self.profile_start_time = None
 
-    def setup_ui(self):
+    def setup_ui(self):  # noqa: PLR0915
         # Main window
         # app.setWindowIcon(QIcon(_WINDOW_ICON))
         self.resize(800, 600)
@@ -148,7 +148,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         self.statusbar_time = QtWidgets.QLabel()
         self.statusbar.addWidget(self.statusbar_time)
 
-        self.settingsDialog = UI_SettingsDialog(self)
+        self.settingsDialog = UISettingsDialog(self)
 
         # Finalization
         self.retranslate_ui()
@@ -252,7 +252,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def configure(self):
-        Ui_ConfigDialog(self, self.config).exec()
+        UiConfigDialog(self, self.config).exec()
         self.update_window_title()
 
     @QtCore.Slot()

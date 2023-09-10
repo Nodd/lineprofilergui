@@ -27,7 +27,7 @@ def load_profile_data(filename):
     #          (line_no3, hits3, total_time3)]}
     # stats.unit = time_factor
     with open(filename, "rb") as fid:
-        stats = pickle.load(fid)
+        stats = pickle.load(fid)  # noqa: S301
 
     data = []
     for func_info, func_stats in stats.timings.items():
@@ -49,7 +49,7 @@ class FunctionData:
         self.parse_stats(stats)
 
     @property
-    def id(self):
+    def func_id(self):
         return (self.filename, self.name)
 
     def load_code(self):
@@ -59,7 +59,7 @@ class FunctionData:
         # the correct lines.
         all_lines = linecache.getlines(self.filename)
         self.code_lines = inspect.getblock(
-            all_lines[self.start_line_no :]  # noqa: E203
+            all_lines[self.start_line_no :]
         )
 
     def parse_stats(self, stats):
@@ -67,9 +67,9 @@ class FunctionData:
         self.total_time = 0.0
         self.was_called = False
         next_stat_index = 0
-        for line_no, code_line in enumerate(self.code_lines):
-            line_no += self.start_line_no + 1  # Lines start at 1
-            code_line = code_line.rstrip()
+        for func_line_no, code_line_raw in enumerate(self.code_lines):
+            line_no = func_line_no + self.start_line_no + 1  # Lines start at 1
+            code_line = code_line_raw.rstrip()
 
             # stats contains data for runned lines only : (line_no, hits, total_time)
             if next_stat_index >= len(stats) or line_no != stats[next_stat_index][0]:
@@ -100,13 +100,11 @@ class FunctionData:
             + 0.068 * color.blueF() ** 2
         )
         perceived_luminance /= 0.642  # Normalize to stay inside the RGB range
-        color = QtGui.QColor.fromRgbF(
+        return QtGui.QColor.fromRgbF(
             color.redF() / perceived_luminance,
             color.greenF() / perceived_luminance,
             color.blueF() / perceived_luminance,
         )
-
-        return color
 
     def __iter__(self):
         yield from self.line_data
@@ -115,7 +113,7 @@ class FunctionData:
 class LineData:
     __slots__ = "_func_data line_no code total_time hits filename".split()
 
-    def __init__(self, func_data, line_no, code, total_time, hits):
+    def __init__(self, func_data, line_no, code, total_time, hits):  # noqa: PLR0913
         self._func_data = func_data
         self.line_no = line_no
         self.code = code
@@ -264,7 +262,7 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
                     time_ms=func_data.total_time * 1e3,
                 ),
             )
-            func_item.setData(self.COL_0, Qt.UserRole, func_data.id)
+            func_item.setData(self.COL_0, Qt.UserRole, func_data.func_id)
             func_item.setFirstColumnSpanned(True)
             if not func_data.was_called:
                 func_item.setForeground(self.COL_0, self.CODE_NOT_RUN_COLOR)
@@ -340,9 +338,9 @@ class ResultsTreeWidget(QtWidgets.QTreeWidget):
 
         # Run
         try:
-            subprocess.Popen(editor_command, shell=False)
+            subprocess.Popen(editor_command, shell=False)  # noqa: S603
         except FileNotFoundError:
-            subprocess.Popen(editor_command, shell=True)
+            subprocess.Popen(editor_command, shell=True)  # noqa: S602
 
     @QtCore.Slot(QtWidgets.QTreeWidgetItem)
     def item_collapsed(self, item):

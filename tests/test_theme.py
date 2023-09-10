@@ -1,5 +1,3 @@
-from qtpy.QtCore import Qt
-
 from lineprofilergui import main, theme
 
 
@@ -8,12 +6,12 @@ class TestTheme:
 
     def test_dark_theme(self, qtbot):
         # Just check that the code runs without error
-        win = main.UI_MainWindow()
+        win = main.UIMainWindow()
         qtbot.addWidget(win)
         theme.apply_dark_theme()
 
     def test_light_theme(self, qtbot):
         # Just check that the code runs without error
-        win = main.UI_MainWindow()
+        win = main.UIMainWindow()
         qtbot.addWidget(win)
         theme.apply_default_theme()

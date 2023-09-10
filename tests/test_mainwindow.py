@@ -164,7 +164,7 @@ class TestMainWindow:
 
         with tmp_path:
             main.icons_factory()
-            win = main.UI_MainWindow()
+            win = main.UIMainWindow()
             qtbot.addWidget(win)
 
             win.config.script = str(scriptfile)

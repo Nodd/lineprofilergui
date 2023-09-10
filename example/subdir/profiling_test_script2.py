@@ -1,6 +1,7 @@
 # type: ignore
 # ruff: noqa: F821
 
+
 @profile
 def fact2(n):
     result = 1

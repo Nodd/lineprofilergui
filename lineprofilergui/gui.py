@@ -23,7 +23,6 @@ LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"
 
 
 class UI_MainWindow(QtWidgets.QMainWindow):
-
     # Used for testing purposes
     profile_finished = QtCore.Signal()
 

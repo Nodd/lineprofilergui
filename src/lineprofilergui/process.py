@@ -27,8 +27,7 @@ class KernprofRun(QtCore.QObject):
 
         # Manage environment
         qenv = QtCore.QProcessEnvironment.systemEnvironment()
-        for name, value in self.config.env.items():
-            qenv.insert(name, value)
+        qenv.insert(self.config.env)
         self.process.setProcessEnvironment(qenv)
 
         self.process.setWorkingDirectory(self.config.wdir)
@@ -57,11 +56,9 @@ class KernprofRun(QtCore.QObject):
             QtCore.QIODevice.ReadOnly | QtCore.QIODevice.Unbuffered,
         )
 
-        # Check file cache now, to try to keep profiled files in the state that they were run
         linecache.checkcache()
 
-        running = self.process.waitForStarted()
-        if not running:
+        if not self.process.waitForStarted():
             self.output_error.emit(_("ERROR: Process failed to start"))
 
     @QtCore.Slot()

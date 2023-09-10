@@ -7,8 +7,8 @@ import pickle
 import subprocess
 import zlib
 
-from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtCore import Qt
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
 
 from .utils import MONOSPACE_FONT
 from .utils import translate as _
@@ -88,7 +88,7 @@ class FunctionData:
     def color(self):
         """Choose deteministic unique color for the function."""
         key = (self.filename + self.name).encode("utf8")
-        hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2**32 * 360
+        hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2**32
         color = QtGui.QColor.fromHsvF(hue, 1.0, 1.0)
 
         # Normalize luminance to get visually uniform colors

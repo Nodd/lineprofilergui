@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from qtpy import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from . import __version__
 from .gui import UIMainWindow

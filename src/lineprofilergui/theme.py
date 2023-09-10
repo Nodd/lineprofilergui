@@ -1,7 +1,7 @@
 import os
 
-from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtCore import Qt
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
 
 
 def apply_dark_theme():

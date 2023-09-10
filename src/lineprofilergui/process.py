@@ -2,11 +2,9 @@ import linecache
 import os
 import shlex
 
-from qtpy import QtCore
+from PySide6 import QtCore
 
 from .utils import translate as _
-
-LOCALE_CODEC = QtCore.QTextCodec.codecForLocale()
 
 
 class KernprofRun(QtCore.QObject):
@@ -27,7 +25,8 @@ class KernprofRun(QtCore.QObject):
 
         # Manage environment
         qenv = QtCore.QProcessEnvironment.systemEnvironment()
-        qenv.insert(self.config.env)
+        for name, value in self.config.env.items():
+            qenv.insert(name, value)
         self.process.setProcessEnvironment(qenv)
 
         self.process.setWorkingDirectory(self.config.wdir)
@@ -64,12 +63,12 @@ class KernprofRun(QtCore.QObject):
     @QtCore.Slot()
     def read_output(self):
         qbytearray = self.process.readAllStandardOutput()
-        self.output_text.emit(LOCALE_CODEC.toUnicode(qbytearray))
+        self.output_text.emit(str(qbytearray, "utf-8"))
 
     @QtCore.Slot()
     def read_error(self):
         qbytearray = self.process.readAllStandardError()
-        self.output_error.emit(LOCALE_CODEC.toUnicode(qbytearray))
+        self.output_error.emit(str(qbytearray, "utf-8"))
 
     @QtCore.Slot()
     def kill(self):

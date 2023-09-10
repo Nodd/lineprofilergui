@@ -9,7 +9,7 @@ readme = "README.rst"
 license = { text = "MIT" }
 dynamic = ["version"]
 requires-python = ">=3.8"
-dependencies = ["line-profiler", "qtpy"]
+dependencies = ["line-profiler", "pyside6"]
 authors = [
     { name = "Joseph Martinot-Lagarde", email = "contrebasse+pypi@gmail.com" },
 ]
@@ -39,8 +39,6 @@ Tracker = "https://github.com/Nodd/lineprofilergui/issues"
 Source = "https://github.com/Nodd/lineprofilergui"
 
 [project.optional-dependencies]
-pyqt5 = ["pyqt5"]
-pyside2 = ["pyside2"]
 test = ["pytest", "pytest-qt", "pytest-cov"]
 dev = ["ruff>=0.0.273", "black>=23"]
 
@@ -61,7 +59,7 @@ pythonpath = "src"                # Pytest >= 7.0, otherwise use PYTHONPATH=src 
 testpaths = ["tests"]
 addopts = "--cov lineprofilergui"
 # TODO: test with pyside too (use PYTEST_QT_API=pyside2 environment variable ?)
-qt_api = "pyqt5"
+qt_api = "pyside6"
 
 [tool.ruff]
 src = ["src", "tests"]

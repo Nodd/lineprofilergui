@@ -5,10 +5,9 @@ import textwrap
 import urllib
 from pathlib import Path
 
-import qtpy
-import qtpy.compat as qtcompat
-from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtCore import Qt
+import PySide6
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
 
 from . import __version__
 from .config import Config, UiConfigDialog
@@ -33,7 +32,7 @@ class UIMainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.setup_ui()
         self.kernprof_run = KernprofRun(self.config)
-        self.connect()
+        self.connect_signals()
 
         self.profile_start_time = None
 
@@ -54,31 +53,31 @@ class UIMainWindow(QtWidgets.QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.dockOutputWidget)
 
         # Actions
-        self.actionCollapse_all = QtWidgets.QAction(self)
+        self.actionCollapse_all = QtGui.QAction(self)
         self.actionCollapse_all.setIcon(ICONS["COLLAPSE"])
-        self.actionExpand_all = QtWidgets.QAction(self)
+        self.actionExpand_all = QtGui.QAction(self)
         self.actionExpand_all.setIcon(ICONS["EXPAND"])
-        self.actionRun = QtWidgets.QAction(self)
+        self.actionRun = QtGui.QAction(self)
         self.actionRun.setIcon(ICONS["START"])
-        self.actionAbort = QtWidgets.QAction(self)
+        self.actionAbort = QtGui.QAction(self)
         self.actionAbort.setIcon(ICONS["STOP"])
         self.actionShowOutput = self.dockOutputWidget.toggleViewAction()
         self.actionShowOutput.setIcon(ICONS["INFO"])
-        self.actionLoadLprof = QtWidgets.QAction(self)
+        self.actionLoadLprof = QtGui.QAction(self)
         self.actionLoadLprof.setIcon(ICONS["READFILE"])
-        self.actionQuit = QtWidgets.QAction(self)
+        self.actionQuit = QtGui.QAction(self)
         self.actionQuit.setIcon(ICONS["ABORT"])
-        self.actionConfigure = QtWidgets.QAction(self)
+        self.actionConfigure = QtGui.QAction(self)
         self.actionConfigure.setIcon(ICONS["CONFIG"])
-        self.actionSettings = QtWidgets.QAction(self)
+        self.actionSettings = QtGui.QAction(self)
         self.actionSettings.setIcon(ICONS["SETTINGS"])
-        self.actionLine_profiler_documentation = QtWidgets.QAction(self)
+        self.actionLine_profiler_documentation = QtGui.QAction(self)
         self.actionLine_profiler_documentation.setIcon(ICONS["HELP"])
-        self.actionGithubLink = QtWidgets.QAction(self)
+        self.actionGithubLink = QtGui.QAction(self)
         self.actionGithubLink.setIcon(ICONS["INFO"])
-        self.actionReportBug = QtWidgets.QAction(self)
+        self.actionReportBug = QtGui.QAction(self)
         self.actionReportBug.setIcon(ICONS["ERROR"])
-        self.actionAbout_Qt = QtWidgets.QAction(self)
+        self.actionAbout_Qt = QtGui.QAction(self)
         self.actionAbout_Qt.setIcon(ICONS["QT"])
 
         # Menu bar
@@ -153,10 +152,10 @@ class UIMainWindow(QtWidgets.QMainWindow):
         # Finalization
         self.retranslate_ui()
         self.read_settings()
-        self.set_running_state(False)
+        self.set_running_state(QtCore.QProcess.NotRunning)
         update_theme()
 
-    def connect(self):
+    def connect_signals(self):
         self.actionCollapse_all.triggered.connect(self.resultsTreeWidget.collapseAll)
         self.actionExpand_all.triggered.connect(self.resultsTreeWidget.expandAll)
         self.actionConfigure.triggered.connect(self.configure)
@@ -241,7 +240,7 @@ class UIMainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def selectLprof(self):
-        filename, _selfilter = qtcompat.getopenfilename(
+        filename, _selfilter = QtWidgets.QFileDialog.getOpenFileName(
             self,
             _("Select line profiler data"),
             "",
@@ -274,6 +273,7 @@ class UIMainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot(QtCore.QProcess.ProcessState)
     def set_running_state(self, running):
+        running = running != QtCore.QProcess.NotRunning
         self.actionRun.setEnabled(not running)
         self.actionAbort.setEnabled(running)
         self.actionConfigure.setEnabled(not running)
@@ -370,8 +370,8 @@ class UIMainWindow(QtWidgets.QMainWindow):
             * **python**: *{sys.version}*
             * **OS**: *{sys.platform}*
             * **line_profiler**: *{line_profiler_version}*
-            * **QtPy API**: *{qtpy.API} {qtpy.PYQT_VERSION if qtpy.API.startswith("pyqt") else qtpy.PYSIDE_VERSION}*
-            * **Qt**: *{qtpy.QT_VERSION}*
+            * **QtPy API**: *{PySide6.API} {PySide6.PYQT_VERSION if PySide6.API.startswith("pyqt") else PySide6.PYSIDE_VERSION}*
+            * **Qt**: *{PySide6.QT_VERSION}*
             """
         ).strip()
         url = f"{LINE_PROFILER_GUI_GITHUB_URL}/issues/new?body={urllib.parse.quote_plus(body)}"

@@ -1,6 +1,6 @@
 import subprocess
 
-from qtpy import QtCore
+from PySide6 import QtCore
 
 from .utils import run_code
 

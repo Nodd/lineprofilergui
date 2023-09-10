@@ -5,9 +5,8 @@ import tempfile
 from functools import cached_property
 from pathlib import Path
 
-import qtpy.compat as qtcompat
-from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtCore import Qt
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
 
 from .utils import ICONS, MONOSPACE_FONT, PIXMAPS
 from .utils import translate as _
@@ -391,7 +390,7 @@ class UiConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def on_wdirButton_clicked(self):
-        if filename := qtcompat.getexistingdirectory(
+        if filename := QtWidgets.QFileDialog.getExistingDirectory(
             self, _("Select Python script"), self.wdirWidget.text()
         ):
             self.wdirWidget.setText(filename)
@@ -432,7 +431,7 @@ class UiConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def on_scriptButton_clicked(self):
-        filename, _selfilter = qtcompat.getopenfilename(
+        filename, _selfilter = QtWidgets.QFileDialog.getOpenFileName(
             self,
             _("Select Python script"),
             self.scriptWidget.text(),
@@ -443,7 +442,7 @@ class UiConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def on_warmupButton_clicked(self):
-        filename, _selfilter = qtcompat.getopenfilename(
+        filename, _selfilter = QtWidgets.QFileDialog.getOpenFileName(
             self,
             _("Select Python warmup script"),
             self.warmupWidget.text(),
@@ -454,7 +453,7 @@ class UiConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def on_statsButton_clicked(self):
-        filename, _selfilter = qtcompat.getsavefilename(
+        filename, _selfilter = QtWidgets.QFileDialog.getSaveFileName(
             self,
             _("Select stats filename"),
             self.statsWidget.text(),
@@ -465,7 +464,7 @@ class UiConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def on_kernprofButton_clicked(self):
-        filename, _selfilter = qtcompat.getopenfilename(
+        filename, _selfilter = QtWidgets.QFileDialog.getOpenFileName(
             self,
             _("Select kernprof executable"),
             self.kernprofWidget.text() or self.config.default_kernprof,

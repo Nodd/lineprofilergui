@@ -1,7 +1,7 @@
 import textwrap
 from pathlib import Path
 
-from qtpy.QtCore import Qt
+from PySide6.QtCore import Qt
 
 from lineprofilergui import main
 

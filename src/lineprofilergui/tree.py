@@ -91,19 +91,18 @@ class FunctionData:
         """Choose deteministic unique color for the function."""
         key = (self.filename + self.name).encode("utf8")
         hue = float(zlib.crc32(key) & 0xFFFFFFFF) / 2**32 * 360
-        color = QtGui.QColor.fromHsv(int(hue), 100, 255)
+        color = QtGui.QColor.fromHsvF(hue, 1.0, 1.0)
 
         # Normalize luminance to get visually uniform colors
-        perceived_luminance = math.sqrt(
-            0.241 * color.redF() ** 2
-            + 0.691 * color.greenF() ** 2
-            + 0.068 * color.blueF() ** 2
-        )
+        red = color.redF()
+        green = color.greenF()
+        blue = color.blueF()
+        perceived_luminance = math.sqrt(0.241 * red ** 2 + 0.691 * green ** 2 + 0.068 * blue ** 2)
         perceived_luminance /= 0.642  # Normalize to stay inside the RGB range
         return QtGui.QColor.fromRgbF(
-            color.redF() / perceived_luminance,
-            color.greenF() / perceived_luminance,
-            color.blueF() / perceived_luminance,
+            red / perceived_luminance,
+            green / perceived_luminance,
+            blue / perceived_luminance,
         )
 
     def __iter__(self):

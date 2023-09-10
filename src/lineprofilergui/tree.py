@@ -58,9 +58,7 @@ class FunctionData:
         # is a chance that the correct version was in cache and we get
         # the correct lines.
         all_lines = linecache.getlines(self.filename)
-        self.code_lines = inspect.getblock(
-            all_lines[self.start_line_no :]
-        )
+        self.code_lines = inspect.getblock(all_lines[self.start_line_no :])
 
     def parse_stats(self, stats):
         self.line_data = []
@@ -97,7 +95,9 @@ class FunctionData:
         red = color.redF()
         green = color.greenF()
         blue = color.blueF()
-        perceived_luminance = math.sqrt(0.241 * red ** 2 + 0.691 * green ** 2 + 0.068 * blue ** 2)
+        perceived_luminance = math.sqrt(
+            0.241 * red**2 + 0.691 * green**2 + 0.068 * blue**2
+        )
         perceived_luminance /= 0.642  # Normalize to stay inside the RGB range
         return QtGui.QColor.fromRgbF(
             red / perceived_luminance,

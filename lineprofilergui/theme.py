@@ -42,10 +42,7 @@ def apply_dark_theme():
 
 def apply_default_theme():
     styles = QtWidgets.QStyleFactory.keys()
-    if "WindowsVista" in styles:
-        style = "WindowsVista"
-    else:
-        style = "Fusion"
+    style = "WindowsVista" if "WindowsVista" in styles else "Fusion"
     QtWidgets.QApplication.setPalette(QtWidgets.QApplication.style().standardPalette())
     QtWidgets.QApplication.setStyle(style)
 

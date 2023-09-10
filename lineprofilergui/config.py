@@ -71,7 +71,7 @@ class Config:
     @property
     def stats(self):
         if self.stats_tmp:
-            return os.fspath(Path(self.temp_dir) / (Path(self.script).stem + ".lprof"))
+            return os.fspath(Path(self.temp_dir) / f"{Path(self.script).stem}.lprof")
         else:
             return self.config_stats or self.default_stats
 
@@ -80,10 +80,7 @@ class Config:
         return self.default_stats_for_script(self.script)
 
     def default_stats_for_script(self, script):
-        if not script:
-            return None
-        else:
-            return os.fspath(Path(script).with_suffix(".lprof"))
+        return os.fspath(Path(script).with_suffix(".lprof")) if script else None
 
     @property
     def isvalid_stats(self):
@@ -395,10 +392,9 @@ class Ui_ConfigDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def on_wdirButton_clicked(self):
-        filename = qtcompat.getexistingdirectory(
+        if filename := qtcompat.getexistingdirectory(
             self, _("Select Python script"), self.wdirWidget.text()
-        )
-        if filename:
+        ):
             self.wdirWidget.setText(filename)
 
     def display_status(self, widget, indicator):

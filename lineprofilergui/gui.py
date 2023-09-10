@@ -260,8 +260,8 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         # Configuration dialog in case of invalid config
         if not self.config.isvalid:
             self.configure()
-            if not self.config.isvalid:
-                return
+        if not self.config.isvalid:
+            return
 
         # Start process
         Path(self.config.stats).unlink(missing_ok=True)
@@ -296,7 +296,7 @@ class UI_MainWindow(QtWidgets.QMainWindow):
         profile_time_str = profile_stop_time.strftime("%X")
         profile_duration_str = str(profile_duration).lstrip("0:")
         if profile_duration_str.startswith("."):
-            profile_duration_str = "0" + profile_duration_str
+            profile_duration_str = f"0{profile_duration_str}"
 
         # Statusbar text
         if exit_status:

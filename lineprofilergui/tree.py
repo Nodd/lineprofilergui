@@ -131,9 +131,7 @@ class LineData:
 
     @property
     def time_str(self):
-        if self.total_time is None:
-            return ""
-        return f"{self.total_time * 1e3:.3f}"
+        return "" if self.total_time is None else f"{self.total_time * 1000.0:.3f}"
 
     @property
     def per_hit_str(self):
@@ -143,9 +141,7 @@ class LineData:
 
     @property
     def hits_str(self):
-        if self.hits is None:
-            return ""
-        return str(self.hits)
+        return "" if self.hits is None else str(self.hits)
 
     @property
     def color(self):

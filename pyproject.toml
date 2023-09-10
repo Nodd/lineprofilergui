@@ -46,7 +46,6 @@ dev = ["ruff>=0.0.273", "black>=23"]
 lineprofilergui = "lineprofilergui.main:main"
 
 [tool.setuptools]
-packages = ["lineprofilergui"]
 license-files = ["LICENSE.txt"]
 include-package-data = false
 

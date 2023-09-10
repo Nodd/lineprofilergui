@@ -1,3 +1,55 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "line-profiler-gui"
+description = "A Qt GUI to run and display line by line profiling data using line_profiler"
+readme = "README.rst"
+license = { text = "MIT" }
+dynamic = ["version"]
+requires-python = ">=3.8"
+dependencies = ["line-profiler", "qtpy"]
+authors = [
+    { name = "Joseph Martinot-Lagarde", email = "contrebasse+pypi@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: MacOS X",
+    "Environment :: Win32 (MS Windows)",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development",
+    "Topic :: System :: Benchmark",
+    "Topic :: Utilities",
+]
+keywords = ["profiling", "profiler", "line_profiler", "gui", "Qt"]
+
+[project.urls]
+Homepage = "https://pypi.org/project/line-profiler-gui/"
+Documentation = "https://github.com/Nodd/lineprofilergui/blob/master/README.rst"
+Tracker = "https://github.com/Nodd/lineprofilergui/issues"
+Source = "https://github.com/Nodd/lineprofilergui"
+
+[project.optional-dependencies]
+pyqt5 = ["pyqt5"]
+pyside2 = ["pyside2"]
+test = ["pytest", "pytest-qt", "pytest-cov"]
+
+[project.gui-scripts]
+lineprofilergui = "lineprofilergui.main:main"
+
+[tool.setuptools]
+packages = ["lineprofilergui"]
+license-files = ["LICENSE.txt"]
+include-package-data = false
+
+[tool.setuptools.dynamic.version]
+attr = "lineprofilergui.__version__"

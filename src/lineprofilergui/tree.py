@@ -111,7 +111,7 @@ class FunctionData:
 
 
 class LineData:
-    __slots__ = "_func_data line_no code total_time hits filename".split()
+    __slots__ = ["_func_data", "line_no", "code", "total_time", "hits", "filename"]
 
     def __init__(self, func_data, line_no, code, total_time, hits):  # noqa: PLR0913
         self._func_data = func_data

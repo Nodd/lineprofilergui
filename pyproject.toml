@@ -53,3 +53,11 @@ include-package-data = false
 
 [tool.setuptools.dynamic.version]
 attr = "lineprofilergui.__version__"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+pythonpath = "src"                # Pytest >= 7.0, otherwise use PYTHONPATH=src pytest
+testpaths = ["tests"]
+addopts = "--cov lineprofilergui"
+# TODO: test with pyside too (use PYTEST_QT_API=pyside2 environment variable ?)
+qt_api = "pyqt5"

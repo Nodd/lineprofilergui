@@ -36,8 +36,6 @@ def commandline_args(args):
     parser.add_argument("script", nargs="?", help="The python script file to run")
     parser.add_argument("args", nargs="...", help="Optional script arguments")
 
-    if args is None:
-        args = sys.argv[1:]
     options = parser.parse_args(args)
 
     options.args = " ".join(options.args)

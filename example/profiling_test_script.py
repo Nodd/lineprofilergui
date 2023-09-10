@@ -1,3 +1,6 @@
+# type: ignore
+# ruff: noqa: F821
+
 import time
 import os
 from pprint import pprint

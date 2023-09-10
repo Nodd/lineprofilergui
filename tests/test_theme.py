@@ -1,7 +1,6 @@
 from qtpy.QtCore import Qt
 
-from lineprofilergui import main
-from lineprofilergui import theme
+from lineprofilergui import main, theme
 
 
 class TestTheme:

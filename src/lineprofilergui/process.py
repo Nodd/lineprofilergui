@@ -1,6 +1,6 @@
+import linecache
 import os
 import shlex
-import linecache
 
 from qtpy import QtCore
 

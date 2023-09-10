@@ -1,11 +1,11 @@
-import sys
 import argparse
+import sys
 
 from qtpy import QtCore, QtWidgets
 
+from . import __version__
 from .gui import UI_MainWindow
 from .utils import icons_factory
-from . import __version__
 
 
 def positive_float(value):

@@ -1,22 +1,23 @@
 import datetime
 import os
 import sys
-from pathlib import Path
 import textwrap
 import urllib
+from pathlib import Path
 
 import qtpy
+import qtpy.compat as qtcompat
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
-import qtpy.compat as qtcompat
 
-from .config import Config, Ui_ConfigDialog
-from .tree import ResultsTreeWidget, load_profile_data
-from .settings import UI_SettingsDialog
-from .utils import translate as _, MONOSPACE_FONT, ICONS, PIXMAPS
-from .process import KernprofRun
 from . import __version__
+from .config import Config, Ui_ConfigDialog
+from .process import KernprofRun
+from .settings import UI_SettingsDialog
 from .theme import update_theme
+from .tree import ResultsTreeWidget, load_profile_data
+from .utils import ICONS, MONOSPACE_FONT, PIXMAPS
+from .utils import translate as _
 
 LINE_PROFILER_GUI_GITHUB_URL = "https://github.com/Nodd/lineprofilergui"
 LINE_PROFILER_DOC_URL = "https://github.com/pyutils/line_profiler#id2"

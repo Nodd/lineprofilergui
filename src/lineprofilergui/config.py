@@ -1,16 +1,16 @@
 import os
-import shutil
 import shlex
-from pathlib import Path
+import shutil
 import tempfile
 from functools import cached_property
+from pathlib import Path
 
+import qtpy.compat as qtcompat
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
-import qtpy.compat as qtcompat
 
-
-from .utils import translate as _, MONOSPACE_FONT, PIXMAPS, ICONS
+from .utils import ICONS, MONOSPACE_FONT, PIXMAPS
+from .utils import translate as _
 
 
 class Config:

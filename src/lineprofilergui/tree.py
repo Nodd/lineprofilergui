@@ -1,16 +1,17 @@
-import linecache
-import pickle
-import inspect
-import zlib
-import os
 import functools
+import inspect
+import linecache
 import math
+import os
+import pickle
 import subprocess
+import zlib
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import Qt
 
-from .utils import translate as _, MONOSPACE_FONT
+from .utils import MONOSPACE_FONT
+from .utils import translate as _
 
 
 def load_profile_data(filename):

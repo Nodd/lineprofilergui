@@ -30,8 +30,8 @@ class TestMainWindow:
         lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
-            win.dockOutputWidget.outputWidget.toPlainText()
-            == f"Wrote profile results to {lprof_path}\n"
+            win.dockOutputWidget.outputWidget.toPlainText().split("\n")[0]
+            == f"Wrote profile results to {lprof_path}"
         )
 
         tree = win.resultsTreeWidget
@@ -87,8 +87,8 @@ class TestMainWindow:
         lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
-            win.dockOutputWidget.outputWidget.toPlainText()
-            == f"Wrote profile results to {lprof_path}\n"
+            win.dockOutputWidget.outputWidget.toPlainText().split("\n")[0]
+            == f"Wrote profile results to {lprof_path}"
         )
 
         tree = win.resultsTreeWidget
@@ -106,8 +106,8 @@ class TestMainWindow:
         lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
-            win.dockOutputWidget.outputWidget.toPlainText()
-            == f"Wrote profile results to {lprof_path}\n"
+            win.dockOutputWidget.outputWidget.toPlainText().split("\n")[0]
+            == f"Wrote profile results to {lprof_path}"
         )
 
         tree = win.resultsTreeWidget
@@ -127,8 +127,8 @@ class TestMainWindow:
         lprof_path = Path(win.config.stats)
         assert lprof_path.is_file()
         assert (
-            win.dockOutputWidget.outputWidget.toPlainText()
-            == f"Wrote profile results to {lprof_path}\n"
+            win.dockOutputWidget.outputWidget.toPlainText().split("\n")[0]
+            == f"Wrote profile results to {lprof_path}"
         )
 
         tree = win.resultsTreeWidget

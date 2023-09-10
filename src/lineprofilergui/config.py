@@ -485,10 +485,9 @@ class ConfigValidator(QtGui.QValidator):
     def validate(self, text, pos):
         config = Config()
         self.config_dialog.ui_to_config(config)
+        is_valid = getattr(config, f"isvalid_{self.widget_id}")
         return (
-            QtGui.QValidator.Acceptable
-            if getattr(config, f"isvalid_{self.widget_id}")
-            else QtGui.QValidator.Intermediate,
+            QtGui.QValidator.Acceptable if is_valid else QtGui.QValidator.Intermediate,
             text,
             pos,
         )
